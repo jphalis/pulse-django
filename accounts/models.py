@@ -15,6 +15,9 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
+from core.models import TimeStampedModel
+from core.utils import readable_number
+
 
 def profile_pic_upload_loc(instance, filename):
     """
@@ -80,6 +83,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     modified = models.DateTimeField(_('last modified'), auto_now=True)
 
+    is_private = models.BooleanField(_('private'), default=False)
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(_('staff'), default=False)
 
@@ -143,3 +147,41 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         Does the user have a specific permission?
         """
         return True
+
+
+@python_2_unicode_compatible
+class Follower(TimeStampedModel):
+    user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
+    followers = models.ManyToManyField('self', related_name='following',
+                                       symmetrical=False)
+
+    class Meta:
+        app_label = 'accounts'
+        ordering = ['-created']
+
+    def __str__(self):
+        return u'{} {}'.format(self.user.first_name, self.user.last_name)
+
+    @cached_property
+    def get_followers_info(self):
+        return self.followers.select_related('user').values(
+            'user__first_name', 'user__last_name', 'user__profile_pic')
+
+    @cached_property
+    def get_following_info(self):
+        return self.following.select_related('user').values(
+            'user__first_name', 'user__last_name', 'user__profile_pic')
+
+    def short_followers_count(self):
+        return readable_number(self.get_followers_info.count(), short=True)
+
+    def short_following_count(self):
+        return readable_number(self.get_following_info.count(), short=True)
+
+    def followers_count(self):
+        return self.get_followers_info.count()
+
+    def following_count(self):
+        return self.get_following_info.count()
+
+MyUser.profile = property(lambda u: Follower.objects.get_or_create(user=u)[0])

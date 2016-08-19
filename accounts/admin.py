@@ -13,17 +13,17 @@ class MyUserAdmin(UserAdmin):
     form = MyUserChangeForm
     add_form = MyUserCreationForm
 
-    list_display = ('id', '__str__', 'is_superuser', 'is_staff',)
+    list_display = ('id', '__str__', 'is_private', 'is_superuser', 'is_staff',)
     list_display_links = ('id', '__str__',)
-    list_filter = ('is_active', 'is_staff', 'is_superuser', 'gender',
-                   'date_joined', 'modified',)
+    list_filter = ('gender', 'is_private', 'is_active', 'is_staff',
+                   'is_superuser', 'date_joined', 'modified',)
     fieldsets = (
         (None,
             {'fields': ('email', 'password',)}),
         ('Basic information',
             {'fields': ('first_name', 'last_name', 'gender', 'profile_pic',)}),
         ('Permissions',
-            {'fields': ('is_active', 'is_staff',
+            {'fields': ('is_private', 'is_active', 'is_staff',
                         'is_superuser', 'user_permissions')}),
         (_('Dates'),
             {'fields': ('date_joined', 'last_login', 'modified',)}),
