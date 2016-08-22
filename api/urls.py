@@ -7,8 +7,8 @@ from .views import (AccountCreateAPIView,
                     MyUserDetailAPIView, MyUserListAPIView)
 from .views import (PasswordChangeView, PasswordResetView,
                     PasswordResetConfirmView)
-# from .views import (PartyCreateAPIView, PartyDetailAPIView,
-#                     PartyListAPIView)
+from .views import (PartyCreateAPIView, PartyDetailAPIView,
+                    PartyListAPIView)
 
 
 # app_name = 'api'
@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^accounts/create/$',
         AccountCreateAPIView.as_view(),
         name='account_create_api'),
-    url(r'^accounts/(?P<id>\d+)/$',
+    url(r'^accounts/(?P<pk>\d+)/$',
         MyUserDetailAPIView.as_view(),
         name='user_account_detail_api'),
 
@@ -40,13 +40,13 @@ urlpatterns = [
         name='rest_password_change'),
 
     # P A R T I E S
-    # url(r'^parties/$',
-    #     PartyListAPIView.as_view(),
-    #     name='party_list_api'),
-    # url(r'^party/(?P<party_id>\d+)/$',
-    #     PartyDetailAPIView.as_view(),
-    #     name='party_detail_api'),
-    # url(r'^party/create/$',
-    #     PartyCreateAPIView.as_view({'post': 'create'}),
-    #     name='party_create_api'),
+    url(r'^parties/$',
+        PartyListAPIView.as_view(),
+        name='party_list_api'),
+    url(r'^party/(?P<party_pk>\d+)/$',
+        PartyDetailAPIView.as_view(),
+        name='party_detail_api'),
+    url(r'^party/create/$',
+        PartyCreateAPIView.as_view({'post': 'create'}),
+        name='party_create_api'),
 ]
