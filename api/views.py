@@ -41,13 +41,12 @@ class APIHomeView(AdminRequiredMixin, CacheMixin, DefaultsMixin, APIView):
                 'password_reset': api_reverse('rest_password_reset',
                                               request=request),
                 'password_change': api_reverse('rest_password_change',
-                                               request=request)
+                                               request=request),
+                'sign_up': api_reverse('account_create_api', request=request),
             },
             'accounts': {
                 'count': MyUser.objects.all().count(),
                 'url': api_reverse('user_account_list_api', request=request),
-                'create_url': api_reverse('account_create_api',
-                                          request=request),
                 'profile_url': api_reverse(
                     'user_account_detail_api', request=request,
                     kwargs={'pk': request.user.pk}),
@@ -97,11 +96,16 @@ class MyUserDetailAPIView(CacheMixin,
     parser_classes = (MultiPartParser, FormParser,)
 
     def get_object(self):
-        user_pk = self.kwargs["pk"]
-        return get_object_or_404(MyUser, pk=user_pk)
+        user = get_object_or_404(MyUser, pk=self.kwargs["pk"])
+        if not user == self.request.user and user.is_private:
+            raise PermissionDenied("This user is private")
+        return user
 
     def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+        obj = get_object_or_404(MyUser, pk=self.kwargs["pk"])
+        if request.user == obj:
+            return self.destroy(request, *args, **kwargs)
+        raise PermissionDenied()
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
@@ -131,6 +135,18 @@ def follow_status_api(request, user_pk):
         )
 
     serializer = FollowerSerializer(followed, context={'request': request})
+    return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def privacy_status_api(request, user_pk):
+    user = get_object_or_404(MyUser, pk=user_pk)
+    if user.is_private:
+        user.is_private = False
+    else:
+        user.is_private = True
+    user.save()
+    serializer = MyUserSerializer(user, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -224,7 +240,7 @@ class NotificationAjaxAPIView(DefaultsMixin, generics.ListAPIView):
         user.save(update_fields=['last_login'])
         queryset = Notification.objects.unread_for_user(user=user).last()
         if not queryset:
-            raise ValidationError({"message":
+            raise ValidationError({"detail":
                                   "You have no new notifications."})
         return queryset
 
@@ -272,8 +288,7 @@ class PartyDetailAPIView(CacheMixin,
         obj = get_object_or_404(Party, pk=party_pk)
         if request.user == obj.user:
             return self.destroy(request, *args, **kwargs)
-        raise PermissionDenied(
-            {"message": "You don't have permission to access this"})
+        raise PermissionDenied()
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)

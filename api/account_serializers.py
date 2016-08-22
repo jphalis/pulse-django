@@ -15,7 +15,7 @@ class FollowerCreateSerializer(serializers.ModelSerializer):
 class FollowerSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Follower
-        fields = ('get_followers_count', 'get_following_count',
+        fields = ('followers_count', 'following_count',
                   'get_followers_info', 'get_following_info',)
 
 

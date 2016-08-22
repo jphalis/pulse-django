@@ -31,6 +31,9 @@ urlpatterns = [
     url(r'^follow/(?P<user_pk>\d+)/$',
         views.follow_status_api,
         name='follow_status_api'),
+    url(r'^privacy_status/(?P<user_pk>\d+)/$',
+        views.privacy_status_api,
+        name='privacy_status_api'),
 
     # A U T H E N T I C A T I O N
     url(r'^password/reset/$',

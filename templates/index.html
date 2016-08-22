@@ -3,14 +3,14 @@
 
 {% block content %}
 
-    <div style="text-align:center; margin-top:5%; margin-bottom: -30px;">
+    <div class="main-section">
         <h1>Welcome to Pulse!</h1>
-        {% if request.user.is_superuser or request.user.is_admin %}
+        <br/><br/>
+        <img class="pulse-logo" src="{% static 'img/pulse-logo.png' %}" alt="Pulse logo" />
             <br/><br/>
             <a href="http://{{ domain }}/hidden/secure/pulse/admin"><h3>ADMIN</h3></a>
-            <br/>
             <a href="http://{{ domain }}/hidden/secure/pulse/api"><h3>API</h3></a>
-            <br/>
+        {% if request.user.is_superuser or request.user.is_staff %}
             <a href="{% url 'generate_rand_data' %}"><h3>Generate Random Data</h3></a>
         {% endif %}
     </div>
