@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+from datetime import datetime
 
 from rest_framework import generics, mixins, permissions, status
 from rest_framework.decorators import api_view
@@ -9,9 +9,12 @@ from rest_framework.reverse import reverse as api_reverse
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from django.shortcuts import get_object_or_404
+
 from accounts.models import Follower, MyUser
 from core.mixins import AdminRequiredMixin, CacheMixin
-# from notifications.signals import notify
+from notifications.models import Notification
+from notifications.signals import notify
 from parties.models import Party
 from .account_serializers import (AccountCreateSerializer, FollowerSerializer,
                                   MyUserSerializer)
@@ -19,7 +22,9 @@ from .auth_serializers import (PasswordResetSerializer,
                                PasswordResetConfirmSerializer,
                                PasswordChangeSerializer)
 from .mixins import DefaultsMixin, FiltersMixin
-from .pagination import AccountPagination, PartyPagination
+from .notification_serializers import NotificationSerializer
+from .pagination import (AccountPagination, NotificationPagination,
+                         PartyPagination)
 from .party_serializers import PartyCreateSerializer, PartySerializer
 from .permissions import IsOwnerOrReadOnly, MyUserIsOwnerOrReadOnly
 
@@ -46,6 +51,11 @@ class APIHomeView(AdminRequiredMixin, CacheMixin, DefaultsMixin, APIView):
                 'profile_url': api_reverse(
                     'user_account_detail_api', request=request,
                     kwargs={'pk': request.user.pk}),
+            },
+            'notifications': {
+                'url': api_reverse('notification_list_api', request=request),
+                'unread_url': api_reverse('get_unread_notifications_api',
+                                          request=request),
             },
             'parties': {
                 'count': Party.objects.active().count(),
@@ -96,7 +106,7 @@ class MyUserDetailAPIView(CacheMixin,
 
 
 @api_view(['POST'])
-def follow_create_api(request, user_pk):
+def follow_status_api(request, user_pk):
     viewing_user = request.user
     follower, created = Follower.objects.get_or_create(user=viewing_user)
     user = get_object_or_404(MyUser, pk=user_pk)
@@ -112,11 +122,11 @@ def follow_create_api(request, user_pk):
         followed.followers.remove(follower)
     else:
         followed.followers.add(follower)
-        # notify.send(
-        #     request.user,
-        #     recipient=user,
-        #     verb='is now supporting you'
-        # )
+        notify.send(
+            viewing_user,
+            recipient=user,
+            verb='{0} is following you'.format(viewing_user.get_full_name())
+        )
 
     serializer = FollowerSerializer(followed, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
@@ -177,6 +187,43 @@ class PasswordChangeView(generics.GenericAPIView):
 
 
 ########################################################################
+# NOTIFICATIONS                                                        #
+########################################################################
+class NotificationAPIView(CacheMixin, DefaultsMixin, generics.ListAPIView):
+    cache_timeout = 60 * 7
+    pagination_class = NotificationPagination
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        """
+        Update all of the notifications to read=True.
+        Get 50 most recent notifications for the user.
+        Delete all of the notifications older than the 50 displayed.
+        Return the 50 most recent notifications for the user.
+        """
+        user = self.request.user
+        notifications = Notification.objects.all_for_user(user=user)
+        notifications.update(read=True)
+        notifications = notifications[:50]
+        if notifications.count() > 0:
+            delete_after_datetime = list(notifications)[-1].created
+            Notification.objects.all_for_user(user).filter(
+                created__lt=delete_after_datetime).delete()
+        return notifications
+
+
+class NotificationAjaxAPIView(DefaultsMixin, generics.ListAPIView):
+    pagination_class = NotificationPagination
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        user.last_login = datetime.now()
+        user.save(update_fields=['last_login'])
+        return Notification.objects.unread_for_user(user=user).last()
+
+
+########################################################################
 # PARTIES                                                              #
 ########################################################################
 class PartyCreateAPIView(ModelViewSet):
@@ -215,7 +262,7 @@ class PartyDetailAPIView(CacheMixin,
         return obj
 
     def delete(self, request, *args, **kwargs):
-        party_pk = self.kwargs["party_pk"]
+        party_pk = self.kwargs["pk"]
         obj = get_object_or_404(Party, pk=party_pk)
         if request.user == obj.user:
             return self.destroy(request, *args, **kwargs)
@@ -237,3 +284,18 @@ class PartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
 
     def get_queryset(self):
         return Party.objects.active()
+
+
+@api_view(['POST'])
+def attend_party_api(request, party_pk):
+    user = request.user
+    party = Party.objects.get(pk=party_pk)
+    party.attendees.add(user)
+    party.save()
+    notify.send(
+        user,
+        recipient=party.owner,
+        verb='{0} will be attending your party'.format(user.get_full_name())
+    )
+    serializer = PartySerializer(party, context={'request': request})
+    return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
