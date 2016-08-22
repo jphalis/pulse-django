@@ -1,52 +1,52 @@
-# from django.conf.urls import url
+from django.conf.urls import url
 
 
-# from . import views
-# from .views import APIHomeView
-# from .views import (AccountCreateAPIView,
-#                     MyUserDetailAPIView, MyUserListAPIView)
-# from .views import (PasswordChangeView, PasswordResetView,
-#                     PasswordResetConfirmView)
+from . import views
+from .views import APIHomeView
+from .views import (AccountCreateAPIView,
+                    MyUserDetailAPIView, MyUserListAPIView)
+from .views import (PasswordChangeView, PasswordResetView,
+                    PasswordResetConfirmView)
 # from .views import (PartyCreateAPIView, PartyDetailAPIView,
 #                     PartyListAPIView)
 
 
-# # app_name = 'api'
-# urlpatterns = [
-#     # G E N E R A L
-#     url(r'^$', APIHomeView.as_view(),
-#         name='api_home'),
+# app_name = 'api'
+urlpatterns = [
+    # G E N E R A L
+    url(r'^$', APIHomeView.as_view(),
+        name='api_home'),
 
-#     # A C C O U N T S
-#     url(r'^accounts/$',
-#         MyUserListAPIView.as_view(),
-#         name='user_account_list_api'),
-#     url(r'^accounts/create/$',
-#         AccountCreateAPIView.as_view(),
-#         name='account_create_api'),
-#     url(r'^accounts/(?P<id>\d+)/$',
-#         MyUserDetailAPIView.as_view(),
-#         name='user_account_detail_api'),
+    # A C C O U N T S
+    url(r'^accounts/$',
+        MyUserListAPIView.as_view(),
+        name='user_account_list_api'),
+    url(r'^accounts/create/$',
+        AccountCreateAPIView.as_view(),
+        name='account_create_api'),
+    url(r'^accounts/(?P<id>\d+)/$',
+        MyUserDetailAPIView.as_view(),
+        name='user_account_detail_api'),
 
-#     # A U T H E N T I C A T I O N
-#     url(r'^password/reset/$',
-#         PasswordResetView.as_view(),
-#         name='rest_password_reset'),
-#     url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
-#         PasswordResetConfirmView.as_view(),
-#         name='rest_password_reset_confirm'),
-#     url(r'^password/change/$',
-#         PasswordChangeView.as_view(),
-#         name='rest_password_change'),
+    # A U T H E N T I C A T I O N
+    url(r'^password/reset/$',
+        PasswordResetView.as_view(),
+        name='rest_password_reset'),
+    url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        PasswordResetConfirmView.as_view(),
+        name='rest_password_reset_confirm'),
+    url(r'^password/change/$',
+        PasswordChangeView.as_view(),
+        name='rest_password_change'),
 
-#     # P A R T I E S
-#     url(r'^parties/$',
-#         PartyListAPIView.as_view(),
-#         name='party_list_api'),
-#     url(r'^party/(?P<party_id>\d+)/$',
-#         PartyDetailAPIView.as_view(),
-#         name='party_detail_api'),
-#     url(r'^party/create/$',
-#         PartyCreateAPIView.as_view({'post': 'create'}),
-#         name='party_create_api'),
-# ]
+    # P A R T I E S
+    # url(r'^parties/$',
+    #     PartyListAPIView.as_view(),
+    #     name='party_list_api'),
+    # url(r'^party/(?P<party_id>\d+)/$',
+    #     PartyDetailAPIView.as_view(),
+    #     name='party_detail_api'),
+    # url(r'^party/create/$',
+    #     PartyCreateAPIView.as_view({'post': 'create'}),
+    #     name='party_create_api'),
+]

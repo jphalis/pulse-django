@@ -32,12 +32,12 @@ urlpatterns = [
         admin.site.urls),
 
     # API
-    # url(r'^hidden/secure/pulse/api/', include('api.urls')),
-    # url(r'^hidden/secure/pulse/auth/', include('rest_framework.urls',
-    #     namespace='rest_framework')),
-    # url(r'^hidden/secure/pulse/api/auth/token/$',
-    #     rest_framework_jwt_views.obtain_jwt_token,
-    #     name='auth_login_api'),
+    url(r'^hidden/secure/pulse/api/', include('api.urls')),
+    url(r'^hidden/secure/pulse/auth/', include('rest_framework.urls',
+        namespace='rest_framework')),
+    url(r'^hidden/secure/pulse/api/auth/token/$',
+        rest_framework_jwt_views.obtain_jwt_token,
+        name='auth_login_api'),
 
     # General
     url(r'^$', views.home, name='home'),

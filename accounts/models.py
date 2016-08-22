@@ -1,10 +1,5 @@
 from __future__ import unicode_literals
 
-try:
-    from urllib.parse import urlencode
-except ImportError:  # python 2
-    from urllib import urlencode
-
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
@@ -21,13 +16,13 @@ from core.utils import readable_number
 
 def profile_pic_upload_loc(instance, filename):
     """
-    Stores the profile picture in username/profile_pictures/filename.
+    Stores the profile picture in <user_id>/profile_pictures/<filename>.
     """
-    return "{0}/profile_pictures/{1}".format(instance.username, filename)
+    return "{0}/profile_pictures/{1}".format(instance.id, filename)
 
 
 class MyUserManager(BaseUserManager):
-    def _create_user(self, email, password, first_name, last_name,
+    def _create_user(self, email, password, full_name,
                      is_staff, is_superuser, **extra_fields):
         """
         Creates and saves a User with the given email and password.
@@ -36,12 +31,12 @@ class MyUserManager(BaseUserManager):
 
         if not email:
             raise ValueError('Users must have an email.')
+        elif not full_name:
+            raise ValueError('Users must have a name.')
 
         email = self.normalize_email(email)
 
-        user = self.model(email=email,
-                          first_name=first_name,
-                          last_name=last_name,
+        user = self.model(email=email, full_name=full_name,
                           is_staff=is_staff, is_active=True,
                           is_superuser=is_superuser, last_login=now,
                           date_joined=now, **extra_fields)
@@ -49,15 +44,13 @@ class MyUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, password=None, first_name=None,
-                    last_name=None, **extra_fields):
-        return self._create_user(email, password, first_name, last_name,
+    def create_user(self, email, full_name, password=None, **extra_fields):
+        return self._create_user(email, password, full_name,
                                  is_staff=False, is_superuser=False,
                                  **extra_fields)
 
-    def create_superuser(self, email, password, first_name=None,
-                         last_name=None, **extra_fields):
-        return self._create_user(email, password, first_name, last_name,
+    def create_superuser(self, email, full_name, password, **extra_fields):
+        return self._create_user(email, password, full_name,
                                  is_staff=True, is_superuser=True,
                                  **extra_fields)
 
@@ -73,8 +66,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         (NO_ANSWER, _('Prefer not to answer')),
     )
     gender = models.IntegerField(choices=GENDER_CHOICES, default=NO_ANSWER)
-    first_name = models.CharField(_('first name'), max_length=50, blank=True)
-    last_name = models.CharField(_('last name'), max_length=50, blank=True)
+    full_name = models.CharField(_('full name'), max_length=100)
     email = models.EmailField(max_length=120, unique=True)
     profile_pic = models.ImageField(_('profile picture'),
                                     upload_to=profile_pic_upload_loc,
@@ -88,7 +80,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(_('staff'), default=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    REQUIRED_FIELDS = ['full_name']
 
     objects = MyUserManager()
 
@@ -98,27 +90,21 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('users')
 
     def __str__(self):
-        return '{0} {1}'.format(self.first_name, self.last_name)
-
-    # def get_absolute_url(self):
-    #     """
-    #     Returns the url for the user.
-    #     """
-    #     return reverse('profile', kwargs={"username": self.username})
+        return self.full_name
 
     @cached_property
     def get_full_name(self):
         """
-        Returns the first_name plus the last_name, with a space in between.
+        Returns the full name of the user.
         """
-        return '{0} {1}'.format(self.first_name, self.last_name)
+        return self.full_name
 
     @cached_property
     def get_short_name(self):
         """
         Returns the first name for the user.
         """
-        return self.first_name
+        return self.full_name.split()[0]
 
     @property
     def user_profile_pic(self):
@@ -165,12 +151,12 @@ class Follower(TimeStampedModel):
     @cached_property
     def get_followers_info(self):
         return self.followers.select_related('user').values(
-            'user__first_name', 'user__last_name', 'user__profile_pic')
+            'user__full_name', 'user__profile_pic')
 
     @cached_property
     def get_following_info(self):
         return self.following.select_related('user').values(
-            'user__first_name', 'user__last_name', 'user__profile_pic')
+            'user__full_name', 'user__profile_pic')
 
     def short_followers_count(self):
         return readable_number(self.get_followers_info.count(), short=True)
