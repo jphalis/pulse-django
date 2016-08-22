@@ -43,6 +43,10 @@ urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^accounts/', include('accounts.urls',
         namespace='accounts')),
+
+
+
+    url(r'^generate/', views.generate_rand_data, name='generate_rand_data')
 ]
 
 if settings.DEBUG:

@@ -150,7 +150,7 @@ class Party(TimeStampedModel):
         verbose_name_plural = _('parties')
 
     def __str__(self):
-        return u'{0}'.format(self.user.get_full_name())
+        return u'{0}'.format(self.user.get_full_name)
 
     @cached_property
     def get_attendees_info(self):

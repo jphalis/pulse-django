@@ -2,7 +2,7 @@ from datetime import datetime
 
 from rest_framework import generics, mixins, permissions, status
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response as RestResponse
 from rest_framework.reverse import reverse as api_reverse
@@ -53,6 +53,8 @@ class APIHomeView(AdminRequiredMixin, CacheMixin, DefaultsMixin, APIView):
                     kwargs={'pk': request.user.pk}),
             },
             'notifications': {
+                'count': Notification.objects.unread_for_user(
+                    request.user).count(),
                 'url': api_reverse('notification_list_api', request=request),
                 'unread_url': api_reverse('get_unread_notifications_api',
                                           request=request),
@@ -125,7 +127,7 @@ def follow_status_api(request, user_pk):
         notify.send(
             viewing_user,
             recipient=user,
-            verb='{0} is following you'.format(viewing_user.get_full_name())
+            verb='{0} is following you'.format(viewing_user.get_full_name)
         )
 
     serializer = FollowerSerializer(followed, context={'request': request})
@@ -220,7 +222,11 @@ class NotificationAjaxAPIView(DefaultsMixin, generics.ListAPIView):
         user = self.request.user
         user.last_login = datetime.now()
         user.save(update_fields=['last_login'])
-        return Notification.objects.unread_for_user(user=user).last()
+        queryset = Notification.objects.unread_for_user(user=user).last()
+        if not queryset:
+            raise ValidationError({"message":
+                                  "You have no new notifications."})
+        return queryset
 
 
 ########################################################################
@@ -295,7 +301,7 @@ def attend_party_api(request, party_pk):
     notify.send(
         user,
         recipient=party.owner,
-        verb='{0} will be attending your party'.format(user.get_full_name())
+        verb='{0} will be attending your party'.format(user.get_full_name)
     )
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)

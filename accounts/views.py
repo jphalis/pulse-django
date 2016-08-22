@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import (authenticate, logout,
-                                 update_session_auth_hash)
+from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
@@ -11,7 +10,8 @@ from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 
-from .forms import ChangePasswordForm, PasswordResetForm, PasswordResetTokenForm
+from .forms import (ChangePasswordForm, PasswordResetForm,
+                    PasswordResetTokenForm)
 from .models import MyUser
 
 # Create your views here.
