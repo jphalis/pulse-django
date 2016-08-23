@@ -9,7 +9,6 @@ class PartySerializer(serializers.HyperlinkedModelSerializer):
     user = serializers.CharField(source='user.full_name', read_only=True)
     user_url = serializers.SerializerMethodField()
     user_profile_pic = serializers.ImageField(source='user.profile_pic')
-    pick_up_interval = serializers.SerializerMethodField()
 
     class Meta:
         model = Party
@@ -21,7 +20,7 @@ class PartySerializer(serializers.HyperlinkedModelSerializer):
 
     def get_party_url(self, obj):
         return api_reverse('party_detail_api',
-                           kwargs={'party_pk': obj.pk},
+                           kwargs={'pk': obj.pk},
                            request=self.context['request'])
 
     def get_user_url(self, obj):

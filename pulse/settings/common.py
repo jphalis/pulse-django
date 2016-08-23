@@ -24,7 +24,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # HOSTING + AUTHENTICATION #
 ############################
 SECRET_KEY = '$_a8js0o91wk)4qjz_se%b#q47n%mzm^=ubwe+^9uu_ig%t2)4'
-LOGIN_URL = "/accounts/login/"
+LOGIN_URL = "/login/"
+LOGOUT_REDIRECT_URL = "/"
 AUTH_USER_MODEL = 'accounts.MyUser'
 
 
@@ -125,17 +126,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # TEMPLATES #
 #############
 CRISPY_TEMPLATE_PACK = "bootstrap3"
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
 
 
 ############
 # SESSIONS #
 ############
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 4 * 6  # six months
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 

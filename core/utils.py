@@ -1,11 +1,10 @@
-def jwt_response_payload_handler(token, user, request, *args, **kwargs):
-    data = {
+def jwt_response_payload_handler(token, user=None, request=None):
+    return {
         "token": token,
-        "user": "{}".format(user.id),
-        "userid": user.id,
+        "user": str(user.email),
+        "userid": str(user.id),
         "active": user.is_active
     }
-    return data
 
 
 def readable_number(value, short=False):

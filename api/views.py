@@ -102,10 +102,7 @@ class MyUserDetailAPIView(CacheMixin,
         return user
 
     def delete(self, request, *args, **kwargs):
-        obj = get_object_or_404(MyUser, pk=self.kwargs["pk"])
-        if request.user == obj:
-            return self.destroy(request, *args, **kwargs)
-        raise PermissionDenied()
+        return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
@@ -208,7 +205,7 @@ class PasswordChangeView(generics.GenericAPIView):
 # NOTIFICATIONS                                                        #
 ########################################################################
 class NotificationAPIView(CacheMixin, DefaultsMixin, generics.ListAPIView):
-    cache_timeout = 60 * 7
+    # cache_timeout = 60 * 7
     pagination_class = NotificationPagination
     serializer_class = NotificationSerializer
 
@@ -276,7 +273,7 @@ class PartyDetailAPIView(CacheMixin,
     serializer_class = PartySerializer
 
     def get_object(self):
-        party_pk = self.kwargs["party_pk"]
+        party_pk = self.kwargs["pk"]
         obj = get_object_or_404(Party, pk=party_pk)
         if obj.party_expired:
             obj.is_active = False
@@ -284,11 +281,7 @@ class PartyDetailAPIView(CacheMixin,
         return obj
 
     def delete(self, request, *args, **kwargs):
-        party_pk = self.kwargs["pk"]
-        obj = get_object_or_404(Party, pk=party_pk)
-        if request.user == obj.user:
-            return self.destroy(request, *args, **kwargs)
-        raise PermissionDenied()
+        return self.destroy(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
@@ -316,7 +309,8 @@ def attend_party_api(request, party_pk):
     notify.send(
         user,
         recipient=party.owner,
-        verb='{0} will be attending your party'.format(user.get_full_name)
+        verb='{0} will be attending your party'.format(user.get_full_name),
+        target=party,
     )
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)

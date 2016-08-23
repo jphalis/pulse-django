@@ -39,6 +39,7 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
     account_url = serializers.SerializerMethodField()
     follower = FollowerSerializer(read_only=True)
     is_active = serializers.BooleanField(read_only=True)
+    gender = serializers.SerializerMethodField()
 
     class Meta:
         model = MyUser
@@ -51,3 +52,6 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
         kwargs = {'pk': obj.pk}
         return api_reverse('user_account_detail_api', kwargs=kwargs,
                            request=request)
+
+    def get_gender(self, obj):
+        return dict(MyUser.GENDER_CHOICES)[obj.gender]

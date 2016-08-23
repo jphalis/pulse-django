@@ -146,7 +146,7 @@ class Follower(TimeStampedModel):
         ordering = ['-created']
 
     def __str__(self):
-        return u'{} {}'.format(self.user.first_name, self.user.last_name)
+        return self.user.full_name
 
     @cached_property
     def get_followers_info(self):

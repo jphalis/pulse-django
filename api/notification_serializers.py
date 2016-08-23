@@ -15,7 +15,7 @@ class NotificationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Notification
         fields = ('id', 'sender', 'sender_url', 'sender_profile_picture',
-                  '__str__', 'view_target_party_url', 'recipient_url', 'read',
+                  '__str__', 'target_url', 'recipient_url', 'read',
                   'created', 'modified',)
 
     def get_recipient_url(self, obj):
@@ -30,23 +30,10 @@ class NotificationSerializer(serializers.HyperlinkedModelSerializer):
         return api_reverse('user_account_detail_api', kwargs=kwargs,
                            request=request)
 
-    def get_view_target_party_url(self, obj):
-        request = self.context['request']
-        if obj.target_object:
-            kwargs = {'party_pk': obj.target_object.pk}
-            return api_reverse('party_detail_api', kwargs=kwargs,
-                               request=request)
-        return None
-
     def get_target_url(self, obj):
         request = self.context['request']
-        if obj.action_object:
-            if obj.verb == "attending":
-                view_name = "party_detail_api"
-                kwargs = {'pk': obj.target_object.pk}
-                return api_reverse(view_name, kwargs=kwargs, request=request)
-            elif obj.verb == "commented":
-                view_name = "comment_detail_api"
-                kwargs = {'pk': obj.action_object.pk}
-                return api_reverse(view_name, kwargs=kwargs, request=request)
+        if obj.target_object:
+            view_name = "party_detail_api"
+            kwargs = {'pk': obj.target_object.pk}
+            return api_reverse(view_name, kwargs=kwargs, request=request)
         return None

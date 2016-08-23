@@ -12,7 +12,6 @@ from .views import (PartyCreateAPIView, PartyDetailAPIView,
                     PartyListAPIView)
 
 
-# app_name = 'api'
 urlpatterns = [
     # G E N E R A L
     url(r'^$', APIHomeView.as_view(),
