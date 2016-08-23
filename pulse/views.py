@@ -18,6 +18,7 @@ def randomword(length):
 
 
 def generate_rand_data(request):
+    import random
     from datetime import datetime, timedelta
     from django.contrib import messages
     from accounts.models import Follower, MyUser
@@ -26,7 +27,6 @@ def generate_rand_data(request):
 
     if MyUser.objects.filter(email='user@test.com').exists():
         messages.error(request, "You should already have data available.")
-        return redirect('home')
     else:
         MyUser.objects.create_user(
             email='user@test.com',
@@ -48,20 +48,20 @@ def generate_rand_data(request):
                 name=randomword(12),
                 location='1 Oak NYC',
                 party_size=Party.SMALL,
-                party_month=8,
-                party_day=25,
+                party_month=random.randint(1, 12),
+                party_day=random.randint(1, 28),
                 start_time=datetime.now(),
-                end_time=datetime.now() + timedelta(hours=3),
+                end_time=datetime.now() + timedelta(hours=random.randint(1, 7)),
                 description='An an valley indeed so no wonder future nature vanity. '
                             'Debating all she mistaken indulged believed provided declared.',
             )
 
         test_user_party = MyUser.objects.get(email='user@test.com')
-        party = Party.objects.party_create(
+        party = Party.objects.get_or_create(
             user=test_user_party,
             party_type=Party.SOCIAL,
             name='test party',
-            location='1 Oak NYC',
+            location='Hoboken, NJ',
             party_size=Party.SMALL,
             party_month=8,
             party_day=25,
@@ -96,5 +96,4 @@ def generate_rand_data(request):
         )
 
         messages.success(request, "Data created!")
-        return redirect('home')
-    return render(request, 'index.html', {})
+    return redirect('home')

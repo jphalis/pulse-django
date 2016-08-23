@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse as api_reverse
 
 from accounts.models import Follower, MyUser
+from parties.models import Party
 
 
 class FollowerCreateSerializer(serializers.ModelSerializer):
@@ -15,7 +16,7 @@ class FollowerCreateSerializer(serializers.ModelSerializer):
 class FollowerSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Follower
-        fields = ('followers_count', 'following_count',
+        fields = ('short_followers_count', 'short_following_count',
                   'get_followers_info', 'get_following_info',)
 
 
@@ -37,15 +38,16 @@ class AccountCreateSerializer(serializers.ModelSerializer):
 
 class MyUserSerializer(serializers.HyperlinkedModelSerializer):
     account_url = serializers.SerializerMethodField()
-    follower = FollowerSerializer(read_only=True)
-    is_active = serializers.BooleanField(read_only=True)
     gender = serializers.SerializerMethodField()
+    is_active = serializers.BooleanField(read_only=True)
+    follower = FollowerSerializer(read_only=True)
+    event_count = serializers.SerializerMethodField()
 
     class Meta:
         model = MyUser
         fields = ('id', 'account_url', 'gender', 'full_name', 'email',
                   'profile_pic', 'date_joined', 'modified',
-                  'is_private', 'is_active', 'follower',)
+                  'is_private', 'is_active', 'follower', 'event_count',)
 
     def get_account_url(self, obj):
         request = self.context['request']
@@ -55,3 +57,6 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_gender(self, obj):
         return dict(MyUser.GENDER_CHOICES)[obj.gender]
+
+    def get_event_count(self, obj):
+        return str(Party.objects.own_parties_hosting(user=obj).count())

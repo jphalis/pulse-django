@@ -157,15 +157,14 @@ class Party(TimeStampedModel):
         """
         Returns the information for each attendee at the party.
         """
-        return self.applicants.values(
-            'first_name', 'last_name', 'profile_pic', 'email')
+        return self.attendees.values('full_name', 'profile_pic',)
 
     @property
     def attendees_count(self):
         """
         Returns the number of attendees of the party.
         """
-        return self.get_attendees_info.count()
+        return str(self.get_attendees_info.count())
 
     def party_expired(self):
         expires_on = date(

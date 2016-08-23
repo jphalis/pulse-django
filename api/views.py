@@ -289,7 +289,7 @@ class PartyDetailAPIView(CacheMixin,
 
 class PartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
                        generics.ListAPIView):
-    cache_timeout = 60 * 60 * 24
+    # cache_timeout = 60 * 60 * 24
     pagination_class = PartyPagination
     serializer_class = PartySerializer
     search_fields = ('user__email', 'user__get_full_name',
