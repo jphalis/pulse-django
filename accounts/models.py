@@ -151,12 +151,12 @@ class Follower(TimeStampedModel):
     @cached_property
     def get_followers_info(self):
         return self.followers.select_related('user').values(
-            'user__full_name', 'user__profile_pic')
+            'user__id', 'user__full_name', 'user__profile_pic')
 
     @cached_property
     def get_following_info(self):
         return self.following.select_related('user').values(
-            'user__full_name', 'user__profile_pic')
+            'user__id', 'user__full_name', 'user__profile_pic')
 
     def short_followers_count(self):
         return readable_number(self.get_followers_info.count(), short=True)

@@ -16,7 +16,7 @@ class FollowerCreateSerializer(serializers.ModelSerializer):
 class FollowerSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Follower
-        fields = ('short_followers_count', 'short_following_count',
+        fields = ('followers_count', 'following_count',
                   'get_followers_info', 'get_following_info',)
 
 
@@ -39,15 +39,14 @@ class AccountCreateSerializer(serializers.ModelSerializer):
 class MyUserSerializer(serializers.HyperlinkedModelSerializer):
     account_url = serializers.SerializerMethodField()
     gender = serializers.SerializerMethodField()
-    is_active = serializers.BooleanField(read_only=True)
+    is_private = serializers.BooleanField(read_only=True)
     follower = FollowerSerializer(read_only=True)
     event_count = serializers.SerializerMethodField()
 
     class Meta:
         model = MyUser
         fields = ('id', 'account_url', 'gender', 'full_name', 'email',
-                  'profile_pic', 'date_joined', 'modified',
-                  'is_private', 'is_active', 'follower', 'event_count',)
+                  'profile_pic', 'is_private', 'follower', 'event_count',)
 
     def get_account_url(self, obj):
         request = self.context['request']
