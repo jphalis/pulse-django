@@ -35,34 +35,41 @@ class APIHomeView(AdminRequiredMixin, CacheMixin, DefaultsMixin, APIView):
     cache_timeout = 60 * 60 * 24 * 30
 
     def get(self, request, format=None):
+        user = request.user
         data = {
             'authentication': {
-                'login': api_reverse('auth_login_api', request=request),
+                'login': api_reverse('auth_login_api',
+                                     request=request),
                 'password_reset': api_reverse('rest_password_reset',
                                               request=request),
                 'password_change': api_reverse('rest_password_change',
                                                request=request),
-                'sign_up': api_reverse('account_create_api', request=request),
+                'sign_up': api_reverse('account_create_api',
+                                       request=request),
             },
             'accounts': {
                 'count': MyUser.objects.all().count(),
-                'url': api_reverse('user_account_list_api', request=request),
-                'profile_url': api_reverse(
-                    'user_account_detail_api', request=request,
-                    kwargs={'pk': request.user.pk}),
+                'url': api_reverse('user_account_list_api',
+                                   request=request),
+                'profile_url': api_reverse('user_account_detail_api',
+                                           request=request,
+                                           kwargs={'pk': user.pk}),
             },
             'notifications': {
-                'count': Notification.objects.unread_for_user(
-                    request.user).count(),
-                'url': api_reverse('notification_list_api', request=request),
+                'count': Notification.objects.unread_for_user(user).count(),
+                'url': api_reverse('notification_list_api',
+                                   request=request),
                 'unread_url': api_reverse('get_unread_notifications_api',
                                           request=request),
             },
             'parties': {
                 'count': Party.objects.active().count(),
-                'url': api_reverse('party_list_api', request=request),
+                'url': api_reverse('party_list_api',
+                                   request=request),
                 'create_url': api_reverse('party_create_api',
                                           request=request),
+                'own_parties': api_reverse('own_party_list_api',
+                                           request=request),
             },
         }
         return RestResponse(data)
@@ -298,6 +305,19 @@ class PartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
 
     def get_queryset(self):
         return Party.objects.active()
+
+
+class OwnPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
+                          generics.ListAPIView):
+    # cache_timeout = 60 * 60 * 24
+    pagination_class = PartyPagination
+    serializer_class = PartySerializer
+    search_fields = ('user__email', 'user__get_full_name',
+                     'attendees__email', 'attendees__get_full_name',)
+    ordering_fields = ('created', 'modified',)
+
+    def get_queryset(self):
+        return Party.objects.own_parties_hosting(self.request.user)
 
 
 @api_view(['POST'])
