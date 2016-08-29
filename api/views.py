@@ -291,7 +291,8 @@ class PartyCreateAPIView(ModelViewSet):
                         image=self.request.data.get('image'),)
         feed_item.send(
             user,
-            verb='{0} created an event'.format(user.get_full_name)
+            verb='{0} created an event'.format(user.get_full_name),
+            target=self,
         )
 
 
@@ -350,16 +351,18 @@ def attend_party_api(request, party_pk):
     party = Party.objects.get(pk=party_pk)
     party.attendees.add(user)
     party.save()
+    party_creator = party.user
     notify.send(
         user,
-        recipient=party.owner,
+        recipient=party_creator,
         verb='{0} will be attending your party'.format(user.get_full_name),
         target=party,
     )
     feed_item.send(
         user,
-        verb='{0} is attending {1}\'s party'.format(user.get_full_name,
-                                                    party.owner.get_full_name)
+        verb='{0} is attending {1}\'s party'.format(
+            user.get_full_name, party_creator.get_full_name),
+        target=party,
     )
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)

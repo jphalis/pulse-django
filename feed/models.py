@@ -27,7 +27,8 @@ class FeedManager(models.Manager):
             if follow.following.count() == 0:
                 return own_feed
             else:
-                following_feed = self.model.following_for_user(user=user)
+                following_feed = self.following_for_user(user=user)
+                print following_feed
                 return (own_feed | following_feed).distinct()
         else:
             return own_feed
@@ -38,7 +39,7 @@ class FeedManager(models.Manager):
         """
         return super(FeedManager, self).get_queryset() \
             .filter(
-                sender_object__follower__in=user.follower.following.all())
+                sender_object_id__in=user.follower.following.values('user_id'))
 
     def own_for_user(self, user):
         """

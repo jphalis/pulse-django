@@ -22,6 +22,7 @@ def generate_rand_data(request):
     from datetime import datetime, timedelta
     from django.contrib import messages
     from accounts.models import Follower, MyUser
+    from feed.signals import feed_item
     from notifications.signals import notify
     from parties.models import Party
 
@@ -42,8 +43,9 @@ def generate_rand_data(request):
         last_user = MyUser.objects.all().last()
         last_user_id = last_user.id
         for num in range(last_user_id - 11, last_user_id):
+            user = MyUser.objects.get(id=num)
             Party.objects.party_create(
-                user=MyUser.objects.get(id=num),
+                user=user,
                 party_type=Party.SOCIAL,
                 name=randomword(12),
                 location='1 Oak NYC',
@@ -55,9 +57,13 @@ def generate_rand_data(request):
                 description='An an valley indeed so no wonder future nature vanity. '
                             'Debating all she mistaken indulged believed provided declared.',
             )
+            feed_item.send(
+                user,
+                verb='{0} created an event'.format(user.get_full_name)
+            )
 
         test_user_party = MyUser.objects.get(email='user@test.com')
-        party = Party.objects.get_or_create(
+        party, created = Party.objects.get_or_create(
             user=test_user_party,
             party_type=Party.SOCIAL,
             name='test party',
@@ -70,6 +76,12 @@ def generate_rand_data(request):
             description='An an valley indeed so no wonder future nature vanity. '
                         'Debating all she mistaken indulged believed provided declared.',
         )
+        feed_item.send(
+            test_user_party,
+            verb='{0} created an event'.format(test_user_party.get_full_name),
+            target=party,
+        )
+
         for val in range(last_user_id - 4, last_user_id):
             if not val == test_user_party.id:
                 attendee = MyUser.objects.get(id=val)
@@ -82,6 +94,12 @@ def generate_rand_data(request):
                         attendee.get_full_name),
                     target=party,
                 )
+                feed_item.send(
+                    attendee,
+                    verb='{0} will be attending {1}\'s party'.format(
+                        attendee.get_full_name, party.user.get_full_name),
+                    target=party,
+                )
 
         viewing_user = MyUser.objects.get(id=last_user_id)
         follower, created = Follower.objects.get_or_create(user=viewing_user)
@@ -89,10 +107,17 @@ def generate_rand_data(request):
         followed, created = Follower.objects.get_or_create(user=the_user)
 
         followed.followers.add(follower)
+        follower.followers.add(followed)
         notify.send(
             viewing_user,
             recipient=the_user,
             verb='{0} is following you'.format(viewing_user.get_full_name)
+        )
+        feed_item.send(
+            viewing_user,
+            verb='{0} will be attending {1}\'s party'.format(
+                viewing_user.get_full_name, the_user.get_full_name),
+            target=party,
         )
 
         messages.success(request, "Data created!")
