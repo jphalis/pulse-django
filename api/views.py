@@ -13,6 +13,8 @@ from django.shortcuts import get_object_or_404
 
 from accounts.models import Follower, MyUser
 from core.mixins import AdminRequiredMixin, CacheMixin
+from feed.models import Feed
+from feed.signals import feed_item
 from notifications.models import Notification
 from notifications.signals import notify
 from parties.models import Party
@@ -21,6 +23,7 @@ from .account_serializers import (AccountCreateSerializer, FollowerSerializer,
 from .auth_serializers import (PasswordResetSerializer,
                                PasswordResetConfirmSerializer,
                                PasswordChangeSerializer)
+from .feed_serializers import FeedSerializer
 from .mixins import DefaultsMixin, FiltersMixin
 from .notification_serializers import NotificationSerializer
 from .pagination import (AccountPagination, NotificationPagination,
@@ -54,6 +57,10 @@ class APIHomeView(AdminRequiredMixin, CacheMixin, DefaultsMixin, APIView):
                 'profile_url': api_reverse('user_account_detail_api',
                                            request=request,
                                            kwargs={'pk': user.pk}),
+            },
+            'feed': {
+                'url': api_reverse('feed_list_api',
+                                   request=request),
             },
             'notifications': {
                 'count': Notification.objects.unread_for_user(user).count(),
@@ -209,6 +216,18 @@ class PasswordChangeView(generics.GenericAPIView):
 
 
 ########################################################################
+# FEED                                                                 #
+########################################################################
+class FeedAPIView(CacheMixin, DefaultsMixin, generics.ListAPIView):
+    # cache_timeout = 60 * 7
+    serializer_class = FeedSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Feed.objects.recent_for_user(user=user, num=50)
+
+
+########################################################################
 # NOTIFICATIONS                                                        #
 ########################################################################
 class NotificationAPIView(CacheMixin, DefaultsMixin, generics.ListAPIView):
@@ -258,7 +277,8 @@ class PartyCreateAPIView(ModelViewSet):
     parser_classes = (MultiPartParser, FormParser,)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user,
+        user = self.request.user
+        serializer.save(user=user,
                         party_type=self.request.data.get('party_type'),
                         name=self.request.data.get('name'),
                         location=self.request.data.get('location'),
@@ -269,6 +289,10 @@ class PartyCreateAPIView(ModelViewSet):
                         end_time=self.request.data.get('end_time'),
                         description=self.request.data.get('description'),
                         image=self.request.data.get('image'),)
+        feed_item.send(
+            user,
+            verb='{0} created an event'.format(user.get_full_name)
+        )
 
 
 class PartyDetailAPIView(CacheMixin,
@@ -331,6 +355,11 @@ def attend_party_api(request, party_pk):
         recipient=party.owner,
         verb='{0} will be attending your party'.format(user.get_full_name),
         target=party,
+    )
+    feed_item.send(
+        user,
+        verb='{0} is attending {1}\'s party'.format(user.get_full_name,
+                                                    party.owner.get_full_name)
     )
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)

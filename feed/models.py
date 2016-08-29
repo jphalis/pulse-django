@@ -5,25 +5,53 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+from accounts.models import Follower
 from core.models import TimeStampedModel
 
 # Create your models here.
 
 
 class FeedManager(models.Manager):
-    def all_for_sender(self, sender):
+    def all_for_user(self, user):
         """
-        Returns all of the feed items for the sender.
+        Returns all of the feed items for the user.
         """
-        return super(FeedManager, self).get_queryset() \
-            .filter(sender_object=sender)
+        try:
+            follow = Follower.objects.select_related('user').get(user=user)
+        except Follower.DoesNotExist:
+            follow = None
 
-    def get_recent_for_sender(self, sender, num):
-        r"""
-        Returns N (num) recent feed items for the sender.
+        own_feed = self.own_for_user(user=user)
+
+        if follow:
+            if follow.following.count() == 0:
+                return own_feed
+            else:
+                following_feed = self.model.following_for_user(user=user)
+                return (own_feed | following_feed).distinct()
+        else:
+            return own_feed
+
+    def following_for_user(self, user):
+        """
+        Returns all of the feed items for the users the user is following.
         """
         return super(FeedManager, self).get_queryset() \
-            .filter(sender_object=sender)[:num]
+            .filter(
+                sender_object__follower__in=user.follower.following.all())
+
+    def own_for_user(self, user):
+        """
+        Returns all of the feed items the user has created.
+        """
+        return super(FeedManager, self).get_queryset() \
+            .filter(sender_object_id=user.id)
+
+    def recent_for_user(self, user, num):
+        """
+        Returns N (num) recent feed items for the user.
+        """
+        return self.all_for_user(user=user)[:num]
 
 
 @python_2_unicode_compatible
@@ -62,4 +90,4 @@ class Feed(TimeStampedModel):
             "target": self.target_object,
             "verb": self.verb,
         }
-        return "%(sender)s %(verb)s" % context
+        return "%(verb)s" % context

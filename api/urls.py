@@ -5,6 +5,7 @@ from . import views
 from .views import APIHomeView
 from .views import (AccountCreateAPIView,
                     MyUserDetailAPIView, MyUserListAPIView)
+from .views import FeedAPIView
 from .views import NotificationAPIView, NotificationAjaxAPIView
 from .views import (PasswordChangeView, PasswordResetView,
                     PasswordResetConfirmView)
@@ -46,6 +47,11 @@ urlpatterns = [
     url(r'^password/change/$',
         PasswordChangeView.as_view(),
         name='rest_password_change'),
+
+    # F E E D
+    url(r'^feed/$',
+        FeedAPIView.as_view(),
+        name='feed_list_api'),
 
     # N O T I F I C A T I O N S
     url(r'^notifications/$',
