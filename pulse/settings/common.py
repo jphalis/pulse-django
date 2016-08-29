@@ -68,6 +68,7 @@ INSTALLED_APPS = (
 
     'accounts',
     'api',
+    'feed',
     'notifications',
     'parties',
 )
