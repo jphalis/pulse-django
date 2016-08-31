@@ -77,6 +77,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
     blocking = models.ManyToManyField('self', related_name='blocked_by',
                                       symmetrical=False)
+    times_flagged = models.PositiveIntegerField(default=0)
     is_private = models.BooleanField(_('private'), default=False)
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(_('staff'), default=False)

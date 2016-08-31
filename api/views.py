@@ -9,12 +9,16 @@ from rest_framework.reverse import reverse as api_reverse
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from django.conf import settings
+from django.core.mail import send_mail
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 
 from accounts.models import Follower, MyUser
 from core.mixins import AdminRequiredMixin, CacheMixin
 from feed.models import Feed
 from feed.signals import feed_item
+from flag.models import Flag
 from notifications.models import Notification
 from notifications.signals import notify
 from parties.models import Party
@@ -272,6 +276,31 @@ class FeedAPIView(CacheMixin, DefaultsMixin, generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Feed.objects.recent_for_user(user=user, num=50)
+
+
+########################################################################
+# FLAGS                                                                #
+########################################################################
+@api_view(['POST'])
+def flag_create_api(request, party_pk):
+    party = get_object_or_404(Party, pk=party_pk)
+    party_creator = party.user
+
+    flagged, created = Flag.objects.get_or_create(party=party,
+                                                  creator=request.user)
+    flagged.flag_count = F('flag_count') + 1
+    flagged.save()
+
+    party_creator.times_flagged = F('times_flagged') + 1
+    party_creator.save()
+
+    send_mail('FLAGGED ITEM',
+              'There is a new flagged item with the id: {}'.format(flagged.id),
+              settings.DEFAULT_HR_EMAIL, [settings.DEFAULT_HR_EMAIL],
+              fail_silently=True)
+
+    serializer = PartySerializer(party, context={'request': request})
+    return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
 
 
 ########################################################################

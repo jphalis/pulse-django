@@ -56,6 +56,11 @@ urlpatterns = [
         FeedAPIView.as_view(),
         name='feed_list_api'),
 
+    # F L A G S
+    url(r'^flag/create/(?P<party_pk>\d+)/$',
+        views.flag_create_api,
+        name='flag_create_api'),
+
     # N O T I F I C A T I O N S
     url(r'^notifications/$',
         NotificationAPIView.as_view(),
