@@ -3,10 +3,12 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 
 from accounts.models import Follower
 from core.models import TimeStampedModel
+from core.utils import readable_number
 
 # Create your models here.
 
@@ -28,7 +30,6 @@ class FeedManager(models.Manager):
                 return own_feed
             else:
                 following_feed = self.following_for_user(user=user)
-                print following_feed
                 return (own_feed | following_feed).distinct()
         else:
             return own_feed
@@ -92,3 +93,10 @@ class Feed(TimeStampedModel):
             "verb": self.verb,
         }
         return "%(verb)s" % context
+
+    @property
+    def time_since(self):
+        timediff = timezone.now() - self.created
+        time = readable_number(
+            round(timediff.total_seconds() / 60), short=True)
+        return "{0} m".format(time)

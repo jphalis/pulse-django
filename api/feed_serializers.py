@@ -14,7 +14,7 @@ class FeedSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Feed
         fields = ('id', 'sender', 'sender_url', 'sender_profile_picture',
-                  '__str__', 'target_url', 'created', 'modified',)
+                  '__str__', 'target_url', 'created', 'time_since',)
 
     def get_sender_url(self, obj):
         request = self.context['request']
