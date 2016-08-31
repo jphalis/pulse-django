@@ -75,6 +75,8 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     modified = models.DateTimeField(_('last modified'), auto_now=True)
 
+    blocking = models.ManyToManyField('self', related_name='blocked_by',
+                                      symmetrical=False)
     is_private = models.BooleanField(_('private'), default=False)
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(_('staff'), default=False)

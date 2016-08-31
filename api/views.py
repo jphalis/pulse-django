@@ -110,10 +110,15 @@ class MyUserDetailAPIView(CacheMixin,
     parser_classes = (MultiPartParser, FormParser,)
 
     def get_object(self):
-        user = get_object_or_404(MyUser, pk=self.kwargs["pk"])
-        if not user == self.request.user and user.is_private:
+        viewing_user = self.request.user
+        obj = get_object_or_404(MyUser, pk=self.kwargs["pk"])
+
+        if not obj == viewing_user and obj.is_private:
             raise PermissionDenied("This user is private")
-        return user
+        elif viewing_user in obj.blocking.all():
+            raise PermissionDenied(
+                "You do not have permission to view that profile.")
+        return obj
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
@@ -144,6 +149,48 @@ def follow_status_api(request, user_pk):
             recipient=user,
             verb='{0} is following you'.format(viewing_user.get_full_name)
         )
+
+        if user in viewing_user.blocking.all():
+            viewing_user.blocking.remove(user)
+
+    serializer = FollowerSerializer(followed, context={'request': request})
+    return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def block_user_api(request, user_pk):
+    viewing_user = request.user
+    user_to_block = get_object_or_404(MyUser, pk=user_pk)
+    follower, created = Follower.objects.get_or_create(user=viewing_user)
+    followed, created = Follower.objects.get_or_create(user=user_to_block)
+
+    # Does the viewing_user follow the user_to_block?
+    # If so, remove them
+    try:
+        user_to_block_followed = (Follower.objects.select_related('user')
+                                          .get(user=user_to_block,
+                                               followers=follower))
+    except Follower.DoesNotExist:
+        user_to_block_followed = None
+
+    if user_to_block_followed:
+        followed.followers.remove(follower)
+
+    # Does the user_to_block follow the viewing_user?
+    # If so, remove them
+    try:
+        viewer_followed = (Follower.objects.select_related('user')
+                                           .get(user=viewing_user,
+                                                followers=followed))
+    except Follower.DoesNotExist:
+        viewer_followed = None
+
+    if viewer_followed:
+        follower.followers.remove(followed)
+
+    # Is the user_to_block already in blocked users?
+    if user_to_block not in viewing_user.blocking.all():
+        viewing_user.blocking.add(user_to_block)
 
     serializer = FollowerSerializer(followed, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
