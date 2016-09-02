@@ -68,19 +68,19 @@ INSTALLED_APPS += (
 DATABASES = {
     'default': {  # get credentials from Heroku database creation
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
+        'NAME': 'd5khaohuskl5qr',
+        'USER': 'mfygswybpsycjf',
+        'PASSWORD': 'RjFurSKTwUT4tdey8pM57CnR_Z',
+        'HOST': 'ec2-54-243-200-63.compute-1.amazonaws.com',
         'PORT': '5432',
     },
 }
 DATABASES['default'] = dj_database_url.config()  # Heroku
 DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql_psycopg2'
-DATABASES['default']['NAME'] = ''
-DATABASES['default']['USER'] = ''
-DATABASES['default']['PASSWORD'] = ''
-DATABASES['default']['HOST'] = ''
+DATABASES['default']['NAME'] = 'd5khaohuskl5qr'
+DATABASES['default']['USER'] = 'mfygswybpsycjf'
+DATABASES['default']['PASSWORD'] = 'RjFurSKTwUT4tdey8pM57CnR_Z'
+DATABASES['default']['HOST'] = 'ec2-54-243-200-63.compute-1.amazonaws.com'
 DATABASES['default']['PORT'] = '5432'
 
 
