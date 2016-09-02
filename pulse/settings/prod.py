@@ -31,9 +31,10 @@ ALLOWED_HOSTS = [
     'domain.com',
     '*.domain.com',
     '127.0.0.1',
+    'pulse-ios.herokuapp.com',
 ]
 CORS_URLS_REGEX = r'^/hidden/secure/pulse/api/.*$'
-FULL_DOMAIN_NAME = ''  # NEED TO ENTER THIS VALUE
+FULL_DOMAIN_NAME = 'pulse-ios.herokuapp.com'  # NEED TO ENTER THIS VALUE
 
 
 # E M A I L
