@@ -87,8 +87,9 @@ class PartyManager(models.Manager):
                            description=description,
                            image=image,
                            **extra_fields)
-        party.attendees.add(user)
         party.save(using=self._db)
+        party.attendees.add(user)
+        party.save()
         return party
 
 
