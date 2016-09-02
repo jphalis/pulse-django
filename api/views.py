@@ -365,10 +365,13 @@ class PartyCreateAPIView(ModelViewSet):
                         end_time=self.request.data.get('end_time'),
                         description=self.request.data.get('description'),
                         image=self.request.data.get('image'),)
+        party = Party.objects.get(id=serializer.data.get('id'))
+        party.attendees.add(user)
+        party.save()
         feed_item.send(
             user,
             verb='{0} created an event'.format(user.get_full_name),
-            target=self,
+            target=party,
         )
 
 

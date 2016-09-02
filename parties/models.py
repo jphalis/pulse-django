@@ -87,6 +87,7 @@ class PartyManager(models.Manager):
                            description=description,
                            image=image,
                            **extra_fields)
+        party.attendees.add(user)
         party.save(using=self._db)
         return party
 
@@ -148,6 +149,7 @@ class Party(TimeStampedModel):
         app_label = 'parties'
         verbose_name = _('party')
         verbose_name_plural = _('parties')
+        ordering = ['-created']
 
     def __str__(self):
         return u'{0}'.format(self.user.get_full_name)
