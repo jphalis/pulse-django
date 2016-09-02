@@ -151,7 +151,8 @@ def follow_status_api(request, user_pk):
         notify.send(
             viewing_user,
             recipient=user,
-            verb='{0} is following you'.format(viewing_user.get_full_name)
+            verb='{0} is now following you'.format(viewing_user.get_full_name),
+            target=viewing_user,
         )
 
         if user in viewing_user.blocking.all():
