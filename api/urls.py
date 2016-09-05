@@ -82,4 +82,7 @@ urlpatterns = [
     url(r'^party/create/$',
         PartyCreateAPIView.as_view({'post': 'create'}),
         name='party_create_api'),
+    url(r'^party/attend/(?P<party_pk>\d+)/$',
+        views.party_attend_api,
+        name='party_attend_api'),
 ]

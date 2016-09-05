@@ -130,8 +130,8 @@ class Party(TimeStampedModel):
         validators=[MaxValueValidator(12)])
     party_day = models.PositiveIntegerField(
         validators=[MaxValueValidator(31)])
-    start_time = models.DateTimeField(verbose_name='Start Time')
-    end_time = models.DateTimeField(verbose_name='End Time')
+    start_time = models.TimeField(verbose_name='Start Time')
+    end_time = models.TimeField(verbose_name='End Time')
     description = models.TextField(max_length=500, blank=True)
     image = models.ImageField(_('party image'), blank=True,
                               upload_to=party_image_upload_loc)

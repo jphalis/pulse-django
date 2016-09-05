@@ -42,6 +42,12 @@ urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^accounts/', include('accounts.urls',
         namespace='accounts')),
+    url(r'^privacy/$',
+        views.privacy_policy,
+        name='privacy_policy'),
+    url(r'^terms/$',
+        views.terms_of_use,
+        name='terms_of_use'),
 
 
 

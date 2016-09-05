@@ -152,7 +152,7 @@ def follow_status_api(request, user_pk):
             viewing_user,
             recipient=user,
             verb='{0} is now following you'.format(viewing_user.get_full_name),
-            target=viewing_user,
+            # target=viewing_user,
         )
 
         if user in viewing_user.blocking.all():
@@ -426,23 +426,27 @@ class OwnPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
 
 
 @api_view(['POST'])
-def attend_party_api(request, party_pk):
+def party_attend_api(request, party_pk):
     user = request.user
     party = Party.objects.get(pk=party_pk)
-    party.attendees.add(user)
+
+    if user in party.attendees.all():
+        party.attendees.remove(user)
+    else:
+        party.attendees.add(user)
+        party_creator = party.user
+        notify.send(
+            user,
+            recipient=party_creator,
+            verb='{0} will be attending your party'.format(user.get_full_name),
+            target=party,
+        )
+        feed_item.send(
+            user,
+            verb='{0} is attending {1}\'s party'.format(
+                user.get_full_name, party_creator.get_full_name),
+            target=party,
+        )
     party.save()
-    party_creator = party.user
-    notify.send(
-        user,
-        recipient=party_creator,
-        verb='{0} will be attending your party'.format(user.get_full_name),
-        target=party,
-    )
-    feed_item.send(
-        user,
-        verb='{0} is attending {1}\'s party'.format(
-            user.get_full_name, party_creator.get_full_name),
-        target=party,
-    )
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
