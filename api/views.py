@@ -117,9 +117,7 @@ class MyUserDetailAPIView(CacheMixin,
         viewing_user = self.request.user
         obj = get_object_or_404(MyUser, pk=self.kwargs["user_pk"])
 
-        if not obj == viewing_user and obj.is_private:
-            raise PermissionDenied("This user is private")
-        elif viewing_user in obj.blocking.all():
+        if viewing_user in obj.blocking.all():
             raise PermissionDenied(
                 "You do not have permission to view that profile.")
         return obj
