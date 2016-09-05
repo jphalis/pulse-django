@@ -23,12 +23,12 @@ class PartySerializer(serializers.HyperlinkedModelSerializer):
 
     def get_party_url(self, obj):
         return api_reverse('party_detail_api',
-                           kwargs={'pk': obj.pk},
+                           kwargs={'party_pk': obj.pk},
                            request=self.context['request'])
 
     def get_user_url(self, obj):
         return api_reverse('user_account_detail_api',
-                           kwargs={'pk': obj.user.pk},
+                           kwargs={'user_pk': obj.user.pk},
                            request=self.context['request'])
 
     def get_party_type(self, obj):

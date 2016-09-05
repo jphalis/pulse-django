@@ -60,7 +60,7 @@ class APIHomeView(AdminRequiredMixin, CacheMixin, DefaultsMixin, APIView):
                                    request=request),
                 'profile_url': api_reverse('user_account_detail_api',
                                            request=request,
-                                           kwargs={'pk': user.pk}),
+                                           kwargs={'user_pk': user.pk}),
             },
             'feed': {
                 'url': api_reverse('feed_list_api',
@@ -115,7 +115,7 @@ class MyUserDetailAPIView(CacheMixin,
 
     def get_object(self):
         viewing_user = self.request.user
-        obj = get_object_or_404(MyUser, pk=self.kwargs["pk"])
+        obj = get_object_or_404(MyUser, pk=self.kwargs["user_pk"])
 
         if not obj == viewing_user and obj.is_private:
             raise PermissionDenied("This user is private")
@@ -385,7 +385,7 @@ class PartyDetailAPIView(CacheMixin,
     serializer_class = PartySerializer
 
     def get_object(self):
-        party_pk = self.kwargs["pk"]
+        party_pk = self.kwargs["party_pk"]
         obj = get_object_or_404(Party, pk=party_pk)
         if obj.party_expired:
             obj.is_active = False

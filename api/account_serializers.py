@@ -3,6 +3,7 @@ from rest_framework.reverse import reverse as api_reverse
 
 from accounts.models import Follower, MyUser
 from parties.models import Party
+from .party_serializers import PartySerializer
 
 
 class FollowerCreateSerializer(serializers.ModelSerializer):
@@ -42,15 +43,17 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
     is_private = serializers.BooleanField(read_only=True)
     follower = FollowerSerializer(read_only=True)
     event_count = serializers.SerializerMethodField()
+    event_images = serializers.SerializerMethodField()
 
     class Meta:
         model = MyUser
         fields = ('id', 'account_url', 'gender', 'full_name', 'email',
-                  'profile_pic', 'is_private', 'follower', 'event_count',)
+                  'profile_pic', 'is_private', 'follower', 'event_count',
+                  'event_images',)
 
     def get_account_url(self, obj):
         request = self.context['request']
-        kwargs = {'pk': obj.pk}
+        kwargs = {'user_pk': obj.pk}
         return api_reverse('user_account_detail_api', kwargs=kwargs,
                            request=request)
 
@@ -59,3 +62,6 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_event_count(self, obj):
         return str(Party.objects.own_parties_hosting(user=obj).count())
+
+    def get_event_images(self, request):
+        return Party.objects.own_parties_hosting(user=request).values('image')
