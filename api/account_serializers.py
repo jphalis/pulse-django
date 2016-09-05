@@ -39,15 +39,15 @@ class AccountCreateSerializer(serializers.ModelSerializer):
 class MyUserSerializer(serializers.HyperlinkedModelSerializer):
     account_url = serializers.SerializerMethodField()
     gender = serializers.SerializerMethodField()
-    is_private = serializers.BooleanField(read_only=True)
     follower = FollowerSerializer(read_only=True)
     event_count = serializers.SerializerMethodField()
     event_images = serializers.SerializerMethodField()
+    viewer_can_see = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = MyUser
         fields = ('id', 'account_url', 'gender', 'full_name', 'email',
-                  'profile_pic', 'is_private', 'follower', 'event_count',
+                  'profile_pic', 'viewer_can_see', 'follower', 'event_count',
                   'event_images',)
 
     def get_account_url(self, obj):
@@ -65,3 +65,9 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
     def get_event_images(self, obj):
         return Party.objects.own_parties_hosting(user=obj).values(
             'id', 'image',)
+
+    def get_viewer_can_see(self, obj):
+        viewing_user = self.context['request'].user
+        if obj.is_private and viewing_user not in obj.follower.followers.all():
+            return False
+        return True
