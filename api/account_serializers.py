@@ -3,7 +3,6 @@ from rest_framework.reverse import reverse as api_reverse
 
 from accounts.models import Follower, MyUser
 from parties.models import Party
-from .party_serializers import PartySerializer
 
 
 class FollowerCreateSerializer(serializers.ModelSerializer):
@@ -63,5 +62,6 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
     def get_event_count(self, obj):
         return str(Party.objects.own_parties_hosting(user=obj).count())
 
-    def get_event_images(self, request):
-        return Party.objects.own_parties_hosting(user=request).values('image')
+    def get_event_images(self, obj):
+        return Party.objects.own_parties_hosting(user=obj).values(
+            'id', 'image',)
