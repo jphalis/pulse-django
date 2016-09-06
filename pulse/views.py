@@ -52,7 +52,7 @@ def generate_rand_data(request):
         last_user_id = last_user.id
         for num in range(last_user_id - 11, last_user_id):
             user = MyUser.objects.get(id=num)
-            Party.objects.party_create(
+            party = Party.objects.party_create(
                 user=user,
                 party_type=Party.SOCIAL,
                 name=randomword(12),
@@ -65,9 +65,11 @@ def generate_rand_data(request):
                 description='An an valley indeed so no wonder future nature vanity. '
                             'Debating all she mistaken indulged believed provided declared.',
             )
+            party.save()
             feed_item.send(
                 user,
-                verb='{0} created an event'.format(user.get_full_name)
+                verb='{0} created an event'.format(user.get_full_name),
+                target=party,
             )
 
         test_user_party = MyUser.objects.get(email='user@test.com')

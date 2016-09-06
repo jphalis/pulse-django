@@ -420,7 +420,21 @@ class OwnPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     ordering_fields = ('created', 'modified',)
 
     def get_queryset(self):
-        return Party.objects.own_parties_hosting(self.request.user)
+        return Party.objects.own_parties_hosting(user=self.request.user)
+
+
+class UserPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
+                           generics.ListAPIView):
+    # cache_timeout = 60 * 60 * 24
+    pagination_class = PartyPagination
+    serializer_class = PartySerializer
+    search_fields = ('user__email', 'user__get_full_name',
+                     'attendees__email', 'attendees__get_full_name',)
+    ordering_fields = ('created', 'modified',)
+
+    def get_queryset(self):
+        user = MyUser.objects.get(pk=self.kwargs['user_pk'])
+        return Party.objects.own_parties_hosting(user=user)
 
 
 @api_view(['POST'])

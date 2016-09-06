@@ -10,7 +10,8 @@ from .views import NotificationAPIView, NotificationAjaxAPIView
 from .views import (PasswordChangeView, PasswordResetView,
                     PasswordResetConfirmView)
 from .views import (OwnPartyListAPIView, PartyCreateAPIView,
-                    PartyDetailAPIView, PartyListAPIView)
+                    PartyDetailAPIView, PartyListAPIView,
+                    UserPartyListAPIView)
 
 
 urlpatterns = [
@@ -76,6 +77,9 @@ urlpatterns = [
     url(r'^parties/own/$',
         OwnPartyListAPIView.as_view(),
         name='own_party_list_api'),
+    url(r'^parties/(?P<user_pk>\d+)/$',
+        UserPartyListAPIView.as_view(),
+        name='user_party_list_api'),
     url(r'^party/(?P<party_pk>\d+)/$',
         PartyDetailAPIView.as_view(),
         name='party_detail_api'),
