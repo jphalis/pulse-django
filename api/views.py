@@ -355,11 +355,13 @@ class PartyCreateAPIView(ModelViewSet):
         user = self.request.user
         serializer.save(user=user,
                         party_type=self.request.data.get('party_type'),
+                        # invite_type=self.request.data.get('invite_type'),
                         name=self.request.data.get('name'),
                         location=self.request.data.get('location'),
                         party_size=self.request.data.get('party_size'),
                         party_month=self.request.data.get('party_month'),
                         party_day=self.request.data.get('party_day'),
+                        party_year=self.request.data.get('party_year'),
                         start_time=self.request.data.get('start_time'),
                         end_time=self.request.data.get('end_time'),
                         description=self.request.data.get('description'),
@@ -402,9 +404,9 @@ class PartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     # cache_timeout = 60 * 60 * 24
     pagination_class = PartyPagination
     serializer_class = PartySerializer
-    search_fields = ('user__email', 'user__get_full_name',
-                     'attendees__email', 'attendees__get_full_name',
-                     'requesters__email', 'requesters__get_full_name',)
+    search_fields = ('user__email', 'user__full_name',
+                     'attendees__email', 'attendees__full_name',
+                     'requesters__email', 'requesters__full_name',)
     ordering_fields = ('created', 'modified',)
 
     def get_queryset(self):
@@ -416,9 +418,9 @@ class OwnPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     # cache_timeout = 60 * 60 * 24
     pagination_class = PartyPagination
     serializer_class = PartySerializer
-    search_fields = ('user__email', 'user__get_full_name',
-                     'attendees__email', 'attendees__get_full_name',
-                     'requesters__email', 'requesters__get_full_name',)
+    search_fields = ('user__email', 'user__full_name',
+                     'attendees__email', 'attendees__full_name',
+                     'requesters__email', 'requesters__full_name',)
     ordering_fields = ('created', 'modified',)
 
     def get_queryset(self):
@@ -430,9 +432,9 @@ class UserPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     # cache_timeout = 60 * 60 * 24
     pagination_class = PartyPagination
     serializer_class = PartySerializer
-    search_fields = ('user__email', 'user__get_full_name',
-                     'attendees__email', 'attendees__get_full_name',
-                     'requesters__email', 'requesters__get_full_name',)
+    search_fields = ('user__email', 'user__full_name',
+                     'attendees__email', 'attendees__full_name',
+                     'requesters__email', 'requesters__full_name',)
     ordering_fields = ('created', 'modified',)
 
     def get_queryset(self):
@@ -447,6 +449,16 @@ def party_attend_api(request, party_pk):
 
     if user in party.attendees.all():
         party.attendees.remove(user)
+    elif party.invite_type == Party.INVITE_ONLY:
+        party.requesters.add(user)
+        party_creator = party.user
+        notify.send(
+            user,
+            recipient=party_creator,
+            verb='{0} has requested to attend your party'.format(
+                user.get_full_name),
+            target=party,
+        )
     else:
         party.attendees.add(user)
         party_creator = party.user
@@ -465,3 +477,40 @@ def party_attend_api(request, party_pk):
     party.save()
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def requester_approve_api(request, party_pk, user_pk):
+    user = MyUser.objects.get(pk=user_pk)
+    party = Party.objects.get(pk=party_pk)
+    party_creator = party.user
+    party.attendees.add(user)
+    party.requesters.remove(user)
+    notify.send(
+        party_creator,
+        recipient=user,
+        verb='{0} has accepted your request to attend'.format(
+            party_creator.get_full_name),
+        target=party,
+    )
+    feed_item.send(
+        user,
+        verb='{0} is attending {1}\'s party'.format(
+            user.get_full_name, party_creator.get_full_name),
+        target=party,
+    )
+
+
+@api_view(['POST'])
+def requester_deny_api(request, party_pk, user_pk):
+    user = MyUser.objects.get(pk=user_pk)
+    party = Party.objects.get(pk=party_pk)
+    party_creator = party.user
+    party.requesters.remove(user)
+    notify.send(
+        party_creator,
+        recipient=user,
+        verb='{0} has denied your request to attend'.format(
+            party_creator.get_full_name),
+        target=party,
+    )

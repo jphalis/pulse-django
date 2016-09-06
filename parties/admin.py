@@ -13,17 +13,32 @@ class PartyAdmin(admin.ModelAdmin):
     raw_id_fields = ['user', 'attendees', 'requesters']
     fieldsets = (
         (None,
-            {'fields': ('party_type', 'name', 'location', 'party_size',
-                        'party_month', 'party_day', 'start_time', 'end_time',
-                        'description', 'image', 'user', 'attendees',
-                        'requesters',)}),
+            {'fields': ('id', 'party_type', 'invite_type', 'name', 'location',
+                        'party_size', 'party_month', 'party_day', 'party_year',
+                        'start_time', 'end_time', 'description', 'image',
+                        'user', 'attendees', 'requesters',)}),
         (_('Permissions'),
             {'fields': ('is_active',)}),
         (_('Dates'),
             {'fields': ('created', 'modified',)}),
     )
-    readonly_fields = ('created', 'modified',)
-    search_fields = ('name', 'user__get_full_name',)
+    readonly_fields = ('id', 'created', 'modified',)
+    search_fields = ('name', 'user__full_name',)
+    actions = ('enable', 'disable',)
+
+    def enable(self, request, queryset):
+        """
+        Updates is_active to be True.
+        """
+        queryset.update(is_active=True)
+    enable.short_description = _("Enable selected parties")
+
+    def disable(self, request, queryset):
+        """
+        Updates is_active to be False.
+        """
+        queryset.update(is_active=False)
+    disable.short_description = _("Disable selected parties")
 
     class Meta:
         model = Party

@@ -89,4 +89,10 @@ urlpatterns = [
     url(r'^party/attend/(?P<party_pk>\d+)/$',
         views.party_attend_api,
         name='party_attend_api'),
+    url(r'^party/approve/(?P<party_pk>\d+)/(?P<user_pk>\d+)/$',
+        views.requester_approve_api,
+        name='requester_approve_api'),
+    url(r'^party/deny/(?P<party_pk>\d+)/(?P<user_pk>\d+)/$',
+        views.requester_deny_api,
+        name='requester_deny_api'),
 ]

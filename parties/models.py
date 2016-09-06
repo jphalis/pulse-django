@@ -107,6 +107,9 @@ class Party(TimeStampedModel):
     MEDIUM = 11
     LARGE = 12
 
+    OPEN = 15
+    INVITE_ONLY = 16
+
     PARTY_TYPES = (
         (CUSTOM, _('Custom')),
         (SOCIAL, _('Social')),
@@ -121,8 +124,13 @@ class Party(TimeStampedModel):
         (MEDIUM, _('Medium')),
         (LARGE, _('Large')),
     )
+    INVITE_TYPES = (
+        (OPEN, _('Open')),
+        (INVITE_ONLY, _('Invite only')),
+    )
 
     party_type = models.IntegerField(choices=PARTY_TYPES, default=CUSTOM)
+    invite_type = models.IntegerField(choices=INVITE_TYPES, default=OPEN)
     name = models.CharField(max_length=80)
     location = models.CharField(max_length=240)
     party_size = models.IntegerField(choices=PARTY_SIZES, default=SMALL)
@@ -130,6 +138,7 @@ class Party(TimeStampedModel):
         validators=[MaxValueValidator(12)])
     party_day = models.PositiveIntegerField(
         validators=[MaxValueValidator(31)])
+    party_year = models.PositiveIntegerField(default=date.today().year)
     start_time = models.TimeField(verbose_name='Start Time')
     end_time = models.TimeField(verbose_name='End Time')
     description = models.TextField(max_length=500, blank=True)
