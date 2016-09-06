@@ -403,7 +403,8 @@ class PartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     pagination_class = PartyPagination
     serializer_class = PartySerializer
     search_fields = ('user__email', 'user__get_full_name',
-                     'attendees__email', 'attendees__get_full_name',)
+                     'attendees__email', 'attendees__get_full_name',
+                     'requesters__email', 'requesters__get_full_name',)
     ordering_fields = ('created', 'modified',)
 
     def get_queryset(self):
@@ -416,7 +417,8 @@ class OwnPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     pagination_class = PartyPagination
     serializer_class = PartySerializer
     search_fields = ('user__email', 'user__get_full_name',
-                     'attendees__email', 'attendees__get_full_name',)
+                     'attendees__email', 'attendees__get_full_name',
+                     'requesters__email', 'requesters__get_full_name',)
     ordering_fields = ('created', 'modified',)
 
     def get_queryset(self):
@@ -429,7 +431,8 @@ class UserPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     pagination_class = PartyPagination
     serializer_class = PartySerializer
     search_fields = ('user__email', 'user__get_full_name',
-                     'attendees__email', 'attendees__get_full_name',)
+                     'attendees__email', 'attendees__get_full_name',
+                     'requesters__email', 'requesters__get_full_name',)
     ordering_fields = ('created', 'modified',)
 
     def get_queryset(self):

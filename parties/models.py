@@ -141,6 +141,9 @@ class Party(TimeStampedModel):
     attendees = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                        related_name='party_attendees',
                                        blank=True)
+    requesters = models.ManyToManyField(settings.AUTH_USER_MODEL,
+                                        related_name='party_requesters',
+                                        blank=True)
 
     is_active = models.BooleanField(_('active'), default=True)
 
@@ -162,12 +165,26 @@ class Party(TimeStampedModel):
         """
         return self.attendees.values('full_name', 'profile_pic',)
 
+    @cached_property
+    def get_requesters_info(self):
+        """
+        Returns the information for each requester at the party.
+        """
+        return self.requesters.values('full_name', 'profile_pic',)
+
     @property
     def attendees_count(self):
         """
         Returns the number of attendees of the party.
         """
         return str(self.get_attendees_info.count())
+
+    @property
+    def requesters_count(self):
+        """
+        Returns the number of requesters of the party.
+        """
+        return str(self.get_requesters_info.count())
 
     def party_expired(self):
         expires_on = date(

@@ -19,7 +19,8 @@ class PartySerializer(serializers.HyperlinkedModelSerializer):
                   'party_type', 'name', 'location', 'party_size',
                   'party_month', 'party_day', 'start_time',
                   'end_time', 'description', 'image',
-                  'attendees_count', 'get_attendees_info',)
+                  'attendees_count', 'requesters_count',
+                  'get_attendees_info', 'get_requesters_info',)
 
     def get_party_url(self, obj):
         return api_reverse('party_detail_api',
