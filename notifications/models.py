@@ -90,11 +90,11 @@ class Notification(TimeStampedModel):
         if self.target_object:
             if self.action_object:
                 if self.verb == "commented":
-                    return "%(sender)s %(verb)s: '%(action)s'" % context
+                    return "%(verb)s: '%(action)s'" % context
                 # Other
                 else:
-                    return "%(sender)s %(verb)s %(action)s" % context
+                    return "%(verb)s %(action)s" % context
         else:
             # No target object
             return "%(verb)s" % context
-        return "%(sender)s %(verb)s" % context
+        return "%(verb)s" % context

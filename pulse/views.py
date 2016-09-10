@@ -68,7 +68,7 @@ def generate_rand_data(request):
             party.save()
             feed_item.send(
                 user,
-                verb='{0} created an event'.format(user.get_full_name),
+                verb='created an event',
                 target=party,
             )
 
@@ -88,7 +88,7 @@ def generate_rand_data(request):
         )
         feed_item.send(
             test_user_party,
-            verb='{0} created an event'.format(test_user_party.get_full_name),
+            verb='created an event',
             target=party,
         )
 
@@ -100,14 +100,13 @@ def generate_rand_data(request):
                 notify.send(
                     attendee,
                     recipient=party.user,
-                    verb='{0} will be attending your party'.format(
-                        attendee.get_full_name),
+                    verb='will be attending your party',
                     target=party,
                 )
                 feed_item.send(
                     attendee,
-                    verb='{0} will be attending {1}\'s party'.format(
-                        attendee.get_full_name, party.user.get_full_name),
+                    verb='will be attending {0}\'s party'.format(
+                        party.user.get_full_name),
                     target=party,
                 )
 
@@ -121,12 +120,12 @@ def generate_rand_data(request):
         notify.send(
             viewing_user,
             recipient=the_user,
-            verb='{0} is following you'.format(viewing_user.get_full_name)
+            verb='is following you',
         )
         feed_item.send(
             viewing_user,
-            verb='{0} will be attending {1}\'s party'.format(
-                viewing_user.get_full_name, the_user.get_full_name),
+            verb='will be attending {0}\'s party'.format(
+                the_user.get_full_name),
             target=party,
         )
 

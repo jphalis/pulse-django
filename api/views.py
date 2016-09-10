@@ -149,7 +149,7 @@ def follow_status_api(request, user_pk):
         notify.send(
             viewing_user,
             recipient=user,
-            verb='{0} is now following you'.format(viewing_user.get_full_name),
+            verb='is now following you',
             # target=viewing_user,
         )
 
@@ -371,7 +371,7 @@ class PartyCreateAPIView(ModelViewSet):
         party.save()
         feed_item.send(
             user,
-            verb='{0} created an event'.format(user.get_full_name),
+            verb='created an event',
             target=party,
         )
 
@@ -455,8 +455,7 @@ def party_attend_api(request, party_pk):
         notify.send(
             user,
             recipient=party_creator,
-            verb='{0} has requested to attend your party'.format(
-                user.get_full_name),
+            verb='has requested to attend your party',
             target=party,
         )
     else:
@@ -465,13 +464,12 @@ def party_attend_api(request, party_pk):
         notify.send(
             user,
             recipient=party_creator,
-            verb='{0} will be attending your party'.format(user.get_full_name),
+            verb='will be attending your party',
             target=party,
         )
         feed_item.send(
             user,
-            verb='{0} is attending {1}\'s party'.format(
-                user.get_full_name, party_creator.get_full_name),
+            verb='is attending {0}\'s party'.format(party_creator.get_full_name),
             target=party,
         )
     party.save()
@@ -486,19 +484,20 @@ def requester_approve_api(request, party_pk, user_pk):
     party_creator = party.user
     party.attendees.add(user)
     party.requesters.remove(user)
+    party.save()
     notify.send(
         party_creator,
         recipient=user,
-        verb='{0} has accepted your request to attend'.format(
-            party_creator.get_full_name),
+        verb='has accepted your request to attend',
         target=party,
     )
     feed_item.send(
         user,
-        verb='{0} is attending {1}\'s party'.format(
-            user.get_full_name, party_creator.get_full_name),
+        verb='is attending {0}\'s party'.format(party_creator.get_full_name),
         target=party,
     )
+    serializer = PartySerializer(party, context={'request': request})
+    return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['POST'])
@@ -507,10 +506,12 @@ def requester_deny_api(request, party_pk, user_pk):
     party = Party.objects.get(pk=party_pk)
     party_creator = party.user
     party.requesters.remove(user)
+    party.save()
     notify.send(
         party_creator,
         recipient=user,
-        verb='{0} has denied your request to attend'.format(
-            party_creator.get_full_name),
+        verb='has denied your request to attend',
         target=party,
     )
+    serializer = PartySerializer(party, context={'request': request})
+    return RestResponse(serializer.data, status=status.HTTP_201_CREATED)

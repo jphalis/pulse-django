@@ -172,14 +172,14 @@ class Party(TimeStampedModel):
         """
         Returns the information for each attendee at the party.
         """
-        return self.attendees.values('full_name', 'profile_pic',)
+        return self.attendees.values('id', 'full_name', 'profile_pic',)
 
     @cached_property
     def get_requesters_info(self):
         """
         Returns the information for each requester at the party.
         """
-        return self.requesters.values('full_name', 'profile_pic',)
+        return self.requesters.values('id', 'full_name', 'profile_pic',)
 
     @property
     def attendees_count(self):
