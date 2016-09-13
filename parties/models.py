@@ -5,7 +5,6 @@ from datetime import date
 from django.conf import settings
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -200,5 +199,5 @@ class Party(TimeStampedModel):
     def party_expired(self):
         expires_on = date(
             date.today().year, self.party_month, self.party_day)
-        return expires_on <= timezone.now()
+        return expires_on <= date(date.today())
     party_expired.boolean = True

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 from rest_framework import generics, mixins, permissions, status
 from rest_framework.decorators import api_view
@@ -389,9 +389,20 @@ class PartyDetailAPIView(CacheMixin,
     def get_object(self):
         party_pk = self.kwargs["party_pk"]
         obj = get_object_or_404(Party, pk=party_pk)
-        if obj.party_expired:
+        expires_on = date(
+            date.today().year, obj.party_month, obj.party_day)
+
+        if expires_on <= date.today():
+            party_expired = True
+        else:
+            party_expired = False
+
+        if party_expired:
             obj.is_active = False
-            obj.save()
+        else:
+            obj.is_active = True
+
+        obj.save()
         return obj
 
     def delete(self, request, *args, **kwargs):
