@@ -108,6 +108,7 @@ class Party(TimeStampedModel):
 
     OPEN = 15
     INVITE_ONLY = 16
+    REQUEST_APPROVAL = 17
 
     PARTY_TYPES = (
         (CUSTOM, _('Custom')),
@@ -126,6 +127,7 @@ class Party(TimeStampedModel):
     INVITE_TYPES = (
         (OPEN, _('Open')),
         (INVITE_ONLY, _('Invite only')),
+        (REQUEST_APPROVAL, _('Request + approval')),
     )
 
     party_type = models.IntegerField(choices=PARTY_TYPES, default=CUSTOM)

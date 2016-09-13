@@ -101,6 +101,8 @@ def generate_rand_data(request):
             description='An an valley indeed so no wonder future nature vanity. '
                         'Debating all she mistaken indulged believed provided declared.',
         )
+        party.attendees.add(test_user_party)
+        party.save()
         feed_item.send(
             test_user_party,
             verb='created an event',
