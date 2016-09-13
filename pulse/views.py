@@ -50,13 +50,25 @@ def generate_rand_data(request):
 
         last_user = MyUser.objects.all().last()
         last_user_id = last_user.id
-        for num in range(last_user_id - 11, last_user_id):
-            user = MyUser.objects.get(id=num)
+        coordinates = (
+            ['-6.21931', '9.06958'],
+            ['2.72985', '-60.87716'],
+            ['54.70628', '131.61506'],
+            ['-27.80537', '139.59436'],
+            ['39.75070', '17.92816'],
+            ['6.46050', '24.88215'],
+            ['2.51270', '-60.48829'],
+        )
+        i = 0
+        for num in coordinates:
+            user = MyUser.objects.order_by('?').first()
             party = Party.objects.party_create(
                 user=user,
                 party_type=Party.SOCIAL,
                 name=randomword(12),
                 location='1 Oak NYC',
+                latitude=coordinates[i][0],
+                longitude=coordinates[i][1],
                 party_size=Party.SMALL,
                 party_month=random.randint(10, 12),
                 party_day=random.randint(1, 28),
@@ -71,6 +83,7 @@ def generate_rand_data(request):
                 verb='created an event',
                 target=party,
             )
+            i += 1
 
         test_user_party = MyUser.objects.get(email='user@test.com')
         party, created = Party.objects.get_or_create(
@@ -78,6 +91,8 @@ def generate_rand_data(request):
             party_type=Party.SOCIAL,
             name='test party',
             location='Hoboken, NJ',
+            latitude="40.743991",
+            longitude="-74.032363",
             party_size=Party.SMALL,
             party_month=11,
             party_day=25,
