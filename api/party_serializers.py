@@ -18,10 +18,11 @@ class PartySerializer(serializers.HyperlinkedModelSerializer):
         model = Party
         fields = ('id', 'party_url', 'user', 'user_profile_pic',
                   'party_type', 'invite_type', 'name', 'location',
-                  'party_size', 'party_month', 'party_day', 'party_year',
-                  'start_time', 'end_time', 'description', 'image',
-                  'attendees_count', 'requesters_count',
-                  'get_attendees_info', 'get_requesters_info',)
+                  'latitude', 'longitude', 'party_size', 'party_month',
+                  'party_day', 'party_year', 'start_time', 'end_time',
+                  'description', 'image', 'attendees_count',
+                  'requesters_count', 'get_attendees_info',
+                  'get_requesters_info',)
 
     def get_party_url(self, obj):
         return api_reverse('party_detail_api',
@@ -55,6 +56,7 @@ class PartyCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Party
         # add invite_type
-        fields = ('id', 'party_type', 'name', 'location', 'party_size',
-                  'party_month', 'party_day', 'party_year',
-                  'start_time', 'end_time', 'description', 'image',)
+        fields = ('id', 'party_type', 'name', 'location', 'latitude',
+                  'longitude', 'party_size', 'party_month', 'party_day',
+                  'party_year', 'start_time', 'end_time', 'description',
+                  'image',)

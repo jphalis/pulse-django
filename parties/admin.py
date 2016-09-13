@@ -14,9 +14,10 @@ class PartyAdmin(admin.ModelAdmin):
     fieldsets = (
         (None,
             {'fields': ('id', 'party_type', 'invite_type', 'name', 'location',
-                        'party_size', 'party_month', 'party_day', 'party_year',
-                        'start_time', 'end_time', 'description', 'image',
-                        'user', 'attendees', 'requesters',)}),
+                        'latitude', 'longitude', 'party_size', 'party_month',
+                        'party_day', 'party_year', 'start_time', 'end_time',
+                        'description', 'image', 'user', 'attendees',
+                        'requesters',)}),
         (_('Permissions'),
             {'fields': ('is_active',)}),
         (_('Dates'),

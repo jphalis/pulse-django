@@ -133,6 +133,8 @@ class Party(TimeStampedModel):
     invite_type = models.IntegerField(choices=INVITE_TYPES, default=OPEN)
     name = models.CharField(max_length=80)
     location = models.CharField(max_length=240)
+    latitude = models.DecimalField(max_digits=12, decimal_places=8, null=True)
+    longitude = models.DecimalField(max_digits=12, decimal_places=8, null=True)
     party_size = models.IntegerField(choices=PARTY_SIZES, default=SMALL)
     party_month = models.PositiveIntegerField(
         validators=[MaxValueValidator(12)])

@@ -358,6 +358,8 @@ class PartyCreateAPIView(ModelViewSet):
                         # invite_type=self.request.data.get('invite_type'),
                         name=self.request.data.get('name'),
                         location=self.request.data.get('location'),
+                        latitude=self.request.data.get('latitude'),
+                        longitude=self.request.data.get('longitude'),
                         party_size=self.request.data.get('party_size'),
                         party_month=self.request.data.get('party_month'),
                         party_day=self.request.data.get('party_day'),
