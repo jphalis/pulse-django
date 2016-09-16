@@ -16,9 +16,9 @@ from core.models import TimeStampedModel
 
 def party_image_upload_loc(instance, filename):
     """
-    Stores the party images in <user_id>/party_images/<filename>.
+    Stores the party images in party_images/<filename>.
     """
-    return "{0}/party_images/{1}".format(instance.id, filename)
+    return "party_images/{1}".format(filename)
 
 
 class PartyManager(models.Manager):
