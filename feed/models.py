@@ -2,13 +2,12 @@ from __future__ import unicode_literals
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db import models
-from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 
 from accounts.models import Follower
 from core.models import TimeStampedModel
-from core.utils import readable_number
 
 # Create your models here.
 
@@ -96,7 +95,8 @@ class Feed(TimeStampedModel):
 
     @property
     def time_since(self):
-        timediff = timezone.now() - self.created
-        time = readable_number(
-            round(timediff.total_seconds() / 60), short=True)
-        return "{0} m".format(time)
+        # timediff = timezone.now() - self.created
+        # time = readable_number(
+        #     round(timediff.total_seconds() / 60), short=True)
+        # return "{0} m".format(time)
+        return naturaltime(self.created)
