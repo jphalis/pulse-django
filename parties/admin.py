@@ -10,14 +10,14 @@ class PartyAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'user', 'is_active',)
     list_display_links = ('id', 'name',)
     list_filter = ('created', 'modified', 'is_active',)
-    raw_id_fields = ['user', 'attendees', 'requesters']
+    raw_id_fields = ['user', 'attendees', 'requesters', 'invited_users']
     fieldsets = (
         (None,
             {'fields': ('id', 'party_type', 'invite_type', 'name', 'location',
                         'latitude', 'longitude', 'party_size', 'party_month',
                         'party_day', 'party_year', 'start_time', 'end_time',
                         'description', 'image', 'user', 'attendees',
-                        'requesters',)}),
+                        'requesters', 'invited_users',)}),
         (_('Permissions'),
             {'fields': ('is_active',)}),
         (_('Dates'),

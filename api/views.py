@@ -353,9 +353,10 @@ class PartyCreateAPIView(ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
+        print self.request.data.get('invited_user_ids')
         serializer.save(user=user,
                         party_type=self.request.data.get('party_type'),
-                        # invite_type=self.request.data.get('invite_type'),
+                        invite_type=self.request.data.get('invite_type'),
                         name=self.request.data.get('name'),
                         location=self.request.data.get('location'),
                         latitude=self.request.data.get('latitude'),
@@ -369,6 +370,16 @@ class PartyCreateAPIView(ModelViewSet):
                         description=self.request.data.get('description'),
                         image=self.request.data.get('image'),)
         party = Party.objects.get(id=serializer.data.get('id'))
+        user_ids = self.request.data.get('invited_user_ids').split(',')
+        for user_id in user_ids:
+            invited = MyUser.objects.get(id=user_id)
+            party.invited_users.add(invited)
+            notify.send(
+                user,
+                recipient=invited,
+                verb='has invited you to their party',
+                target=party,
+            )
         party.attendees.add(user)
         party.save()
         feed_item.send(
