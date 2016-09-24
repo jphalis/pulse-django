@@ -145,6 +145,7 @@ if USING_S3:
     AWS_STORAGE_BUCKET_NAME = 'pulseapplication'
     S3_URL = '//{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
 
+    AWS_QUERYSTRING_AUTH = False
     AWS_FILE_EXPIRE = 200
     AWS_PRELOAD_METADATA = True
     AWS_S3_SECURE_URLS = True
