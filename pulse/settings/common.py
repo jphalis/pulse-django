@@ -27,6 +27,7 @@ SECRET_KEY = '$_a8js0o91wk)4qjz_se%b#q47n%mzm^=ubwe+^9uu_ig%t2)4'
 LOGIN_URL = "/login/"
 LOGOUT_REDIRECT_URL = "/"
 AUTH_USER_MODEL = 'accounts.MyUser'
+APP_NAME = 'pulse'
 
 
 #########
