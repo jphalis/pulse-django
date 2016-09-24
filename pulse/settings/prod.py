@@ -15,7 +15,6 @@ Glossary of settings/prod.py:
 
 from .common import *
 import dj_database_url
-from storages.backends.s3boto import S3BotoStorage
 
 DEBUG = True
 
@@ -152,9 +151,9 @@ if USING_S3:
     AWS_S3_SECURE_URLS = True
     S3DIRECT_REGION = 'us-east-1'
 
-    STATICFILES_STORAGE = 'lambda: S3BotoStorage(location="static")'
+    STATICFILES_STORAGE = '{}.s3utils.StaticRootS3BotoStorage'.format(APP_NAME)
     STATIC_S3_PATH = 'media/'
-    DEFAULT_FILE_STORAGE = 'lambda: S3BotoStorage(location="media")'
+    DEFAULT_FILE_STORAGE = '{}.s3utils.MediaRootS3BotoStorage'.format(APP_NAME)
     DEFAULT_S3_PATH = 'static/'
 
     if USING_CLOUDFRONT:
