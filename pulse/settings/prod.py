@@ -135,16 +135,14 @@ EXCLUDE_FROM_MINIFYING = ('^hidden/secure/pulse/admin/',)
 
 
 # S T A T I C F I L E S
+USING_HEROKU = True
 USING_S3 = True
 USING_CLOUDFRONT = False
 
 if USING_S3:
-    # AWS_ACCESS_KEY_ID = 'AKIAI7W36GPXJW3W4UVA'
-    # AWS_SECRET_ACCESS_KEY = '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'
-    # AWS_STORAGE_BUCKET_NAME = 'pulseapplication'
-    AWS_ACCESS_KEY_ID = 'AKIAIR5XW2FKVPAC6IXQ'
-    AWS_SECRET_ACCESS_KEY = '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'
-    AWS_STORAGE_BUCKET_NAME = 'oby'
+    AWS_ACCESS_KEY_ID = 'AKIAI7W36GPXJW3W4UVA'
+    AWS_SECRET_ACCESS_KEY = '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'
+    AWS_STORAGE_BUCKET_NAME = 'pulseapplication'
     S3_URL = '//{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
 
     AWS_FILE_EXPIRE = 200
@@ -161,6 +159,14 @@ if USING_S3:
         AWS_CLOUDFRONT_DOMAIN = ''
         MEDIA_URL = '//{}/{}'.format(AWS_CLOUDFRONT_DOMAIN, STATIC_S3_PATH)
         STATIC_URL = '//{}/{}'.format(AWS_CLOUDFRONT_DOMAIN, DEFAULT_S3_PATH)
+    elif USING_HEROKU:
+        STATICFILES_DIRS = (
+            os.path.join(BASE_DIR, '..', 'static', 'static_dirs'),
+        )
+        STATIC_ROOT = os.path.join(BASE_DIR, '..', 'static', 'static')
+        STATIC_URL = '/static/'
+        MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'media')
+        MEDIA_URL = '/media/'
     else:
         MEDIA_URL = S3_URL + STATIC_S3_PATH
         STATIC_URL = S3_URL + DEFAULT_S3_PATH
