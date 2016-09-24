@@ -16,8 +16,6 @@ Glossary of settings/prod.py:
 from .common import *
 import dj_database_url
 
-DEBUG = True
-
 
 # HOSTING + AUTHENTICATION
 ADMINS = (
