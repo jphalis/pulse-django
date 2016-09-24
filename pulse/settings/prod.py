@@ -28,7 +28,7 @@ ADMINS = (
     # ("Frank Szucs", ""),
 )
 MANAGERS = ADMINS
-FULL_DOMAIN_NAME = 'pulse-ios.herokuapp.com'
+FULL_DOMAIN = 'pulse-ios.herokuapp.com'
 ALLOWED_HOSTS = [
     '127.0.0.1',
     '*{}'.format(FULL_DOMAIN),
