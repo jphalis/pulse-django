@@ -111,7 +111,7 @@ class MyUserCreationForm(UserCreationForm):
         if self.initial.get('email') == value:
             return value
         if MyUser.objects.filter(
-                Q(email__iexact=value) & ~Q(id=self.user.id)).exists():
+                Q(email__iexact=value) & ~Q(id=self.id)).exists():
             raise forms.ValidationError(
                 _('This email is already taken. Please try a different one.'))
         return value
