@@ -137,7 +137,7 @@ EXCLUDE_FROM_MINIFYING = ('^hidden/secure/pulse/admin/',)
 
 
 # S T A T I C F I L E S
-USING_S3 = True
+USING_S3 = False
 USING_CLOUDFRONT = False
 
 if USING_S3:
