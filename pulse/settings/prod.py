@@ -152,9 +152,9 @@ if USING_S3:
     AWS_S3_SECURE_URLS = True
     S3DIRECT_REGION = 'us-east-1'
 
-    STATICFILES_STORAGE = lambda: S3BotoStorage(location='static')
+    STATICFILES_STORAGE = 'lambda: S3BotoStorage(location="static")'
     STATIC_S3_PATH = 'media/'
-    DEFAULT_FILE_STORAGE = lambda: S3BotoStorage(location='media')
+    DEFAULT_FILE_STORAGE = 'lambda: S3BotoStorage(location="media")'
     DEFAULT_S3_PATH = 'static/'
 
     if USING_CLOUDFRONT:
