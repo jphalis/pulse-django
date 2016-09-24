@@ -135,21 +135,20 @@ EXCLUDE_FROM_MINIFYING = ('^hidden/secure/pulse/admin/',)
 
 
 # S T A T I C F I L E S
-USING_HEROKU = True
 USING_S3 = True
 USING_CLOUDFRONT = False
+USING_EC2 = False
 
 if USING_S3:
-    AWS_ACCESS_KEY_ID = 'AKIAI7W36GPXJW3W4UVA'
-    AWS_SECRET_ACCESS_KEY = '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'
-    AWS_STORAGE_BUCKET_NAME = 'pulseapplication'
-    S3_URL = '//{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
+    AWS_ACCESS_KEY_ID = ''
+    AWS_SECRET_ACCESS_KEY = ''
+    AWS_STORAGE_BUCKET_NAME = ''
+    S3DIRECT_REGION = 'us-east-1'
 
     AWS_QUERYSTRING_AUTH = False
     AWS_FILE_EXPIRE = 200
     AWS_PRELOAD_METADATA = True
     AWS_S3_SECURE_URLS = True
-    S3DIRECT_REGION = 'us-east-1'
 
     STATICFILES_STORAGE = '{}.s3utils.StaticRootS3BotoStorage'.format(APP_NAME)
     STATIC_S3_PATH = 'media/'
@@ -160,15 +159,8 @@ if USING_S3:
         AWS_CLOUDFRONT_DOMAIN = ''
         MEDIA_URL = '//{}/{}'.format(AWS_CLOUDFRONT_DOMAIN, STATIC_S3_PATH)
         STATIC_URL = '//{}/{}'.format(AWS_CLOUDFRONT_DOMAIN, DEFAULT_S3_PATH)
-    elif USING_HEROKU:
-        STATICFILES_DIRS = (
-            os.path.join(BASE_DIR, '..', 'static', 'static_dirs'),
-        )
-        STATIC_ROOT = os.path.join(BASE_DIR, '..', 'static', 'static')
-        STATIC_URL = '/static/'
-        MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'media')
-        MEDIA_URL = '/media/'
-    else:
+    elif USING_EC2:
+        S3_URL = '//{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
         MEDIA_URL = S3_URL + STATIC_S3_PATH
         STATIC_URL = S3_URL + DEFAULT_S3_PATH
         MEDIA_ROOT = '/home/ubuntu/{0}/{1}/media'.format(
@@ -176,24 +168,12 @@ if USING_S3:
         STATIC_ROOT = '/home/ubuntu/{0}/{1}/static/static'.format(
             FULL_DOMAIN, APP_NAME)
 
-    STATICFILES_DIRS = (
-        os.path.join(os.path.dirname(BASE_DIR), 'static', 'static_dirs'),
-    )
-
     date_three_months_later = datetime.date.today() + datetime.timedelta(3 * 365 / 12)
     expires = date_three_months_later.strftime('%A, %d %B %Y 20:00:00 EST')
     AWS_HEADERS = {
         'Expires': expires,
         'Cache-Control': 'max-age=86400',
     }
-else:
-    STATICFILES_DIRS = (
-        os.path.join(BASE_DIR, '..', 'static', 'static_dirs'),
-    )
-    STATIC_ROOT = os.path.join(BASE_DIR, '..', 'static', 'static')
-    STATIC_URL = '/static/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'media')
-    MEDIA_URL = '/media/'
 
 
 # L O G G I N G

@@ -138,6 +138,17 @@ SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
+###############
+# STATICFILES #
+###############
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, '..', 'static', 'static_dirs'),
+)
+STATIC_ROOT = os.path.join(BASE_DIR, '..', 'static', 'static')
+STATIC_URL = '/static/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'media')
+MEDIA_URL = '/media/'
+
 
 ################
 # FILE UPLOADS #
