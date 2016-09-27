@@ -1,9 +1,48 @@
 {% extends 'base.html' %}
 
+<style>
+    {% block style %}
+        .main-section{
+            background-color: #fff;
+            border-radius: 4px;
+            color: #333;
+            text-align: left;
+            padding: 7px 30px;
+            margin-bottom: 50px;
+        }
+        ol li {
+            font-weight: 700;
+            line-height: 2.5;
+        }
+        li {
+            padding-left: 10px;
+        }
+    {% endblock style %}
+</style>
+
 {% block content %}
-
     <div class="main-section">
-        <h1>Terms of Use</h1>
+        <h2>Terms of Usage</h2>
+        <br>
+        <p>
+            By accessing or using the Pulse platform, the Pulse service, or any other applications (including mobile applications) made available by Pulse Enterprises LLC (together, the "Service"), however accessed, you agree to be bound by these terms of use (hereinafter "Terms of Usage"). The Service is owned and controlled by Pulse Enterprises LLC (hereinafter "Pulse"). <b>These Terms affect your legal rights and obligations. If you do not agree to be bound by all of these Terms of Use, do not access or use the Service. Your continued utilization of the Pulse platform, Service, or application will be representative of your agreement to observe and be bound by these Terms of Usage.</b>
+        </p>
+        <h5 style="font-style:bold;">
+            ARBITRATION NOTICE: YOU AGREE THAT DISPUTES BETWEEN YOU AND PULSE WILL BE RESOLVED BY BINDING, INDIVIDUAL ARBITRATION AND YOU WAIVE YOUR RIGHT TO PARTICIPATE IN A CLASS ACTION LAWSUIT OR CLASS-WIDE ARBITRATION.
+        </h5>
+        <ol>
+            <li>You must be 18 years old to access or use the Service.</li>
+            <li>You agree that you access or use the Service at your own risk.</li>
+            <li>You agree that due to the nature of the utility of Pulse, you may be physically harmed while engaging in any event viewed and or attended on or through Pulse. Should such happen, you agree that since Pulse is merely a connector between you and the host of the said event, you hereby agree that Pulse shall not in any way, shape, or form be held liable for such damages resulting from the said physical harm to your person.</li>
+            <li>You agree that you will not hold Pulse liable should any damages of any kind occur as a result of your use of the Service.</li>
+            <li>You may not create falsified, fraudulent, or fabricated event postings on Pulse.</li>
+            <li>By using the Service, you agree that you may be subjected to a high level of risk of physical, emotional, and or monetary damages that may result from the actions of others users, either through the Service, or outside of the Service. You agree that in the event that you do incur such damages, you shall defend and hold harmless Pulse in any legal action.</li>
+            <li>Pulse does not in any way, shape, or form, condone the consumption of alcoholic beverages by those who have yet to attain the age of 21. Furthermore, Pulse advocates and strictly requires that in the course of utilizing the Service, you observe and obey applicable federal, state, and local laws in effect at the time of your use of the Service. You agree that ANY infraction of this policy, or any applicable federal, state, and local laws will be caused by you and solely you.</li>
+            <li>If hosting an event at a residence, you agree not to illegally commercialize the said residence, or you agree to first secure consent in proceeding to do so from your state and or local governing body prior to hosting such.</li>
+            <li>By hosting an event through Pulse, you agree to behave responsibly, in accordance with all federal, state, and local laws, mandates, and ordinances. Furthermore, you agree that should any damages, of any kind, occur as a direct or indirect result of your event hosting, you, the person who freely chose to host the event shall be held liable, and not Pulse.</li>
+            <li>If you choose to host a commercial event through Pulse, you agree that you and not Pulse shall incur the tax liability associated with revenues generated from the said event.</li>
+            <li>You agree not to solicit, abuse, or harass other users that you interact with on the Service.</li>
+            <li>Pulse reserves the right to modify these Terms of Usage at any time, with or without notice to You, the user.</li>
+        </ol>
     </div>
-
 {% endblock content %}
