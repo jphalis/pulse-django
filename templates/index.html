@@ -2,17 +2,12 @@
 {% load staticfiles %}
 
 {% block content %}
-
     <div class="main-section">
         <h1>Welcome to Pulse!</h1>
         <br/><br/>
         <img class="pulse-logo" src="{% static 'img/pulse-logo.png' %}" alt="Pulse logo" />
-            <br/><br/>
-            <a href="http://{{ domain }}/hidden/secure/pulse/admin"><h3>ADMIN</h3></a>
-            <a href="http://{{ domain }}/hidden/secure/pulse/api"><h3>API</h3></a>
-        {% if request.user.is_superuser or request.user.is_staff %}
+        {% if request.user.is_superuser %}
             <a href="{% url 'generate_rand_data' %}"><h3>Generate Random Data</h3></a>
         {% endif %}
     </div>
-
 {% endblock content %}

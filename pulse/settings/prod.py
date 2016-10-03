@@ -7,7 +7,6 @@ Glossary of settings/prod.py:
 - Installed applications
 - Database
 - Templates
-- HTML minification
 - Cache
 - Staticfiles
 - Logging
@@ -110,11 +109,6 @@ TEMPLATES = [
         },
     },
 ]
-
-
-# H T M L  M I N I F I C A T I O N
-KEEP_COMMENTS_ON_MINIFYING = False
-EXCLUDE_FROM_MINIFYING = ('^hidden/secure/pulse/admin/',)
 
 
 # C A C H E

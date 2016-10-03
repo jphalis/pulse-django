@@ -4,16 +4,14 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>{% block title %}{% endblock title %}</title>
+        <title>Pulse</title>
         <meta name="author" content="Pulse">
         <meta name="description" content="Party locator">
         <meta name="keywords" content="party, social, college">
         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, minimum-scale=1, maximum-scale=1">
         <meta name="msapplication-tap-highlight" content="no">
 
-        <!-- Need to make one of these -->
-        <!-- <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}" /> -->
-
+        <!-- CSS -->
         <link href="{% static 'vendors/bootstrap/bootstrap.min.css' %}" rel="stylesheet" media="screen">
         <link href="{% static 'custom/css/pulse.css' %}" rel="stylesheet" media="screen">
         <style>{% block style %}{% endblock style %}</style>
@@ -50,6 +48,8 @@
 
                 {% block content %}{% endblock content %}
             </div>
+
+            <!-- JavaScript -->
             <script src="{% static 'vendors/jQuery/jquery.min.js' %}" type="text/javascript"></script>
             <script src="{% static 'vendors/bootstrap/bootstrap.min.js' %}" type="text/javascript"></script>
         {% endspaceless %}
