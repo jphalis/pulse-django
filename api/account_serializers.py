@@ -60,7 +60,10 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
         return dict(MyUser.GENDER_CHOICES)[obj.gender]
 
     def get_event_count(self, obj):
-        return str(Party.objects.own_parties_hosting(user=obj).count())
+        count = Party.objects.own_parties_hosting(user=obj).count()
+        if count == 0:
+            return '0'
+        return str(count)
 
     def get_event_images(self, obj):
         return Party.objects.own_parties_hosting(user=obj).values(
