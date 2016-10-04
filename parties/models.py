@@ -18,7 +18,7 @@ def party_image_upload_loc(instance, filename):
     """
     Stores the party images in party_images/<filename>.
     """
-    return "party_images/{1}".format(filename)
+    return "party_images/{}".format(filename)
 
 
 class PartyManager(models.Manager):
@@ -171,7 +171,7 @@ class Party(TimeStampedModel):
         ordering = ['-created']
 
     def __str__(self):
-        return u'{0}'.format(self.user.get_full_name)
+        return u'{}'.format(self.user.get_full_name)
 
     @cached_property
     def get_attendees_info(self):
