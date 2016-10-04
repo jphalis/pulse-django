@@ -18,7 +18,7 @@ def profile_pic_upload_loc(instance, filename):
     """
     Stores the profile picture in <user_id>/profile_pictures/<filename>.
     """
-    return "profile_pictures/{1}".format(filename)
+    return "profile_pictures/{}".format(filename)
 
 
 class MyUserManager(BaseUserManager):
