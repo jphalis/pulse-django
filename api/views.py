@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 
 from rest_framework import generics, mixins, permissions, status
 from rest_framework.decorators import api_view
@@ -353,7 +353,6 @@ class PartyCreateAPIView(ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
-        print self.request.data.get('invited_user_ids')
         serializer.save(user=user,
                         party_type=self.request.data.get('party_type'),
                         invite_type=self.request.data.get('invite_type'),
@@ -370,16 +369,18 @@ class PartyCreateAPIView(ModelViewSet):
                         description=self.request.data.get('description'),
                         image=self.request.data.get('image'),)
         party = Party.objects.get(id=serializer.data.get('id'))
-        user_ids = self.request.data.get('invited_user_ids').split(',')
-        for user_id in user_ids:
-            invited = MyUser.objects.get(id=user_id)
-            party.invited_users.add(invited)
-            notify.send(
-                user,
-                recipient=invited,
-                verb='has invited you to their party',
-                target=party,
-            )
+        user_ids = self.request.data.get('invited_user_ids')
+
+        if user_ids:
+            for user_id in user_ids.split(','):
+                invited = MyUser.objects.get(id=user_id)
+                party.invited_users.add(invited)
+                notify.send(
+                    user,
+                    recipient=invited,
+                    verb='has invited you to their party',
+                    target=party,
+                )
         party.attendees.add(user)
         party.save()
         feed_item.send(
@@ -400,10 +401,11 @@ class PartyDetailAPIView(CacheMixin,
     def get_object(self):
         party_pk = self.kwargs["party_pk"]
         obj = get_object_or_404(Party, pk=party_pk)
-        expires_on = date(
-            date.today().year, obj.party_month, obj.party_day)
+        expires_on = datetime(
+            obj.party_year, obj.party_month, obj.party_day,
+            int(obj.end_time.strftime('%H')), int(obj.end_time.strftime('%M')))
 
-        if expires_on <= date.today():
+        if expires_on <= datetime.now():
             party_expired = True
         else:
             party_expired = False

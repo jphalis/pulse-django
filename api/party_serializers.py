@@ -53,9 +53,16 @@ class PartySerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PartyCreateSerializer(serializers.ModelSerializer):
+    party_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Party
         fields = ('id', 'party_type', 'name', 'location', 'latitude',
                   'longitude', 'party_size', 'party_month', 'party_day',
                   'party_year', 'start_time', 'end_time', 'description',
-                  'image', 'invite_type',)
+                  'image', 'invite_type', 'party_url',)
+
+    def get_party_url(self, obj):
+        return api_reverse('party_detail_api',
+                           kwargs={'party_pk': obj.pk},
+                           request=self.context['request'])
