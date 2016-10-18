@@ -22,7 +22,7 @@ class MyUserAdmin(UserAdmin):
         (None,
             {'fields': ('email', 'password',)}),
         ('Basic information',
-            {'fields': ('full_name', 'gender', 'profile_pic',)}),
+            {'fields': ('full_name', 'gender', 'profile_pic', 'bio',)}),
         ('Permissions',
             {'fields': ('is_private', 'is_active', 'is_staff',
                         'is_superuser', 'user_permissions')}),

@@ -71,6 +71,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     profile_pic = models.ImageField(_('profile picture'),
                                     upload_to=profile_pic_upload_loc,
                                     blank=True)
+    bio = models.TextField(max_length=500, blank=True, null=True)
 
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     modified = models.DateTimeField(_('last modified'), auto_now=True)
