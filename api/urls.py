@@ -3,15 +3,14 @@ from django.conf.urls import url
 
 from . import views
 from .views import APIHomeView
-from .views import (AccountCreateAPIView,
-                    MyUserDetailAPIView, MyUserListAPIView)
+from .views import (AccountCreateAPIView, MyUserDetailAPIView,
+                    MyUserListAPIView, PhotoCreateAPIView)
 from .views import FeedAPIView
 from .views import NotificationAPIView, NotificationAjaxAPIView
 from .views import (PasswordChangeView, PasswordResetView,
                     PasswordResetConfirmView)
 from .views import (OwnPartyListAPIView, PartyCreateAPIView,
-                    PartyDetailAPIView, PartyListAPIView,
-                    UserPartyListAPIView)
+                    PartyDetailAPIView, PartyListAPIView, UserPartyListAPIView)
 
 
 urlpatterns = [
@@ -29,6 +28,9 @@ urlpatterns = [
     url(r'^accounts/(?P<user_pk>\d+)/$',
         MyUserDetailAPIView.as_view(),
         name='user_account_detail_api'),
+    url(r'^accounts/photos/create/$',
+        PhotoCreateAPIView.as_view({'post': 'create'}),
+        name='photo_create_api'),
     url(r'^follow/(?P<user_pk>\d+)/$',
         views.follow_status_api,
         name='follow_status_api'),

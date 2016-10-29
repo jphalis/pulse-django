@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.utils.translation import ugettext as _
 
 from .forms import MyUserChangeForm, MyUserCreationForm
-from .models import MyUser
+from .models import MyUser, Photo
 
 # Register your models here.
 
@@ -59,5 +59,15 @@ class MyUserAdmin(UserAdmin):
     disable.short_description = _("Disable selected users")
 
 
+class PhotoAdmin(admin.ModelAdmin):
+    list_display = ['id', '__str__']
+    list_display_links = ('id', '__str__',)
+    readonly_fields = ['created', 'modified']
+
+    class Meta:
+        model = Photo
+
+
 admin.site.unregister(Group)
 admin.site.register(MyUser, MyUserAdmin)
+admin.site.register(Photo, PhotoAdmin)

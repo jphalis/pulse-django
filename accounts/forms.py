@@ -20,7 +20,6 @@ from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMultiAlternatives
-from django.db.models import Q
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -152,10 +151,10 @@ class PasswordResetForm(forms.Form):
         return (u for u in active_users if u.has_usable_password())
 
     def save(self, subject_template_name='Pulse Reset Password',
-             email_template_name='accounts/password_reset_email.html',
+             email_template_name='password_reset_email.html',
              use_https=False, token_generator=default_token_generator,
              from_email=settings.DEFAULT_HR_EMAIL, request=None,
-             html_email_template_name='accounts/password_reset_email.html',
+             html_email_template_name='password_reset_email.html',
              extra_email_context=None):
         """
         Generates a one-use only link for resetting password and sends to the
@@ -174,6 +173,7 @@ class PasswordResetForm(forms.Form):
             }
             if extra_email_context is not None:
                 context.update(extra_email_context)
+
             self.send_mail(subject_template_name, email_template_name,
                            context, from_email, user.email,
                            html_email_template_name=html_email_template_name)
@@ -209,8 +209,7 @@ class PasswordResetTokenForm(forms.Form):
         Saves the form and sets the user's password to be the value he/she
         typed in.
         """
-        password = self.cleaned_data["password2"]
-        self.user.set_password(password)
+        self.user.set_password(self.cleaned_data["password_confirm"])
         if commit:
             self.user.save()
         return self.user

@@ -14,7 +14,7 @@ from django.core.mail import send_mail
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 
-from accounts.models import Follower, MyUser
+from accounts.models import Follower, MyUser, Photo
 from core.mixins import AdminRequiredMixin, CacheMixin
 from feed.models import Feed
 from feed.signals import feed_item
@@ -23,7 +23,7 @@ from notifications.models import Notification
 from notifications.signals import notify
 from parties.models import Party
 from .account_serializers import (AccountCreateSerializer, FollowerSerializer,
-                                  MyUserSerializer)
+                                  MyUserSerializer, PhotoCreateSerializer)
 from .auth_serializers import (PasswordResetSerializer,
                                PasswordResetConfirmSerializer,
                                PasswordChangeSerializer)
@@ -127,6 +127,17 @@ class MyUserDetailAPIView(CacheMixin,
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
+
+
+class PhotoCreateAPIView(ModelViewSet):
+    queryset = Photo.objects.select_related('user').all()
+    serializer_class = PhotoCreateSerializer
+    parser_classes = (MultiPartParser, FormParser,)
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        user.save()
+        serializer.save(user=user, photo=self.request.data.get('photo'))
 
 
 @api_view(['POST'])
@@ -436,7 +447,8 @@ class PartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     ordering_fields = ('created', 'modified',)
 
     def get_queryset(self):
-        return Party.objects.active()
+        return Party.objects.all().filter(
+            is_active=True).exclude(party_type=Party.INVITE_ONLY)
 
 
 class OwnPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,

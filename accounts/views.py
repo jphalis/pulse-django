@@ -34,17 +34,17 @@ def password_change(request):
             update_session_auth_hash(request, form.user)
             messages.success(request,
                              "You have successfully changed your password.")
-    return render(request, 'accounts/settings/password_change.html',
+    return render(request, 'password_change.html',
                   {'form': form})
 
 
 def password_reset(request, from_email=settings.DEFAULT_FROM_EMAIL,
                    template_name='accounts/password_reset.html',
-                   email_template_name='accounts/password_reset_email.html',
+                   email_template_name='apassword_reset_email.html',
                    subject_template_name='Pulse Reset Password',
                    password_reset_form=PasswordResetForm,
                    token_generator=default_token_generator,
-                   html_email_template_name='accounts/password_reset_email.html'):
+                   html_email_template_name='password_reset_email.html'):
     """
     Renders a reset change password view for the current user.
     """
@@ -102,7 +102,7 @@ def password_reset_confirm(request, uidb64=None, token=None,
         'form': form,
         'validlink': validlink
     }
-    return render(request, 'accounts/password_set.html', context)
+    return render(request, 'password_set.html', context)
 
 
 def auth_logout(request):

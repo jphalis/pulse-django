@@ -16,9 +16,16 @@ from core.utils import readable_number
 
 def profile_pic_upload_loc(instance, filename):
     """
-    Stores the profile picture in <user_id>/profile_pictures/<filename>.
+    Stores the profile picture in profile_pictures/<filename>.
     """
     return "profile_pictures/{}".format(filename)
+
+
+def photo_upload_loc(instance, filename):
+    """
+    Stores the photo in photos/<filename>.
+    """
+    return "photos/{}".format(filename)
 
 
 class MyUserManager(BaseUserManager):
@@ -95,7 +102,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('users')
 
     def __str__(self):
-        return self.full_name
+        return str(self.full_name)
 
     @cached_property
     def get_full_name(self):
@@ -141,6 +148,19 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
 
 @python_2_unicode_compatible
+class Photo(TimeStampedModel):
+    user = models.ForeignKey(MyUser)
+    photo = models.ImageField(upload_to=photo_upload_loc)
+
+    class Meta:
+        app_label = 'accounts'
+        ordering = ['-created']
+
+    def __str__(self):
+        return str(self.user.full_name)
+
+
+@python_2_unicode_compatible
 class Follower(TimeStampedModel):
     user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
     followers = models.ManyToManyField('self', related_name='following',
@@ -151,7 +171,7 @@ class Follower(TimeStampedModel):
         ordering = ['-created']
 
     def __str__(self):
-        return self.user.full_name
+        return str(self.user.full_name)
 
     @cached_property
     def get_followers_info(self):

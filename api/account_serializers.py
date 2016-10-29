@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.reverse import reverse as api_reverse
 
-from accounts.models import Follower, MyUser
+from accounts.models import Follower, MyUser, Photo
 from parties.models import Party
 
 
@@ -18,6 +18,27 @@ class FollowerSerializer(serializers.HyperlinkedModelSerializer):
         model = Follower
         fields = ('followers_count', 'following_count',
                   'get_followers_info', 'get_following_info',)
+
+
+class PhotoCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = ('user', 'photo',)
+
+
+class PhotoSerializer(serializers.HyperlinkedModelSerializer):
+    user = serializers.CharField(source='user.full_name', read_only=True)
+    user_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Photo
+        fields = ('id', 'user', 'user_url', 'photo', 'created', 'modified',)
+
+    def get_user_url(self, obj):
+        request = self.context['request']
+        kwargs = {'user_pk': obj.user.pk}
+        return api_reverse('user_account_detail_api',
+                           kwargs=kwargs, request=request)
 
 
 class AccountCreateSerializer(serializers.ModelSerializer):
@@ -43,11 +64,12 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
     event_count = serializers.SerializerMethodField()
     event_images = serializers.SerializerMethodField()
     viewer_can_see = serializers.SerializerMethodField(read_only=True)
+    photos = serializers.SerializerMethodField()
 
     class Meta:
         model = MyUser
         fields = ('id', 'account_url', 'gender', 'full_name', 'email',
-                  'profile_pic', 'bio', 'birthday', 'viewer_can_see',
+                  'profile_pic', 'photos', 'bio', 'birthday', 'viewer_can_see',
                   'follower', 'event_count', 'event_images',)
 
     def get_account_url(self, obj):
@@ -68,6 +90,12 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
     def get_event_images(self, obj):
         return Party.objects.own_parties_hosting(user=obj).values(
             'id', 'image',)
+
+    def get_photos(self, obj):
+        queryset = Photo.objects.filter(user=obj)
+        serializer = PhotoSerializer(queryset, context=self.context, many=True,
+                                     read_only=True)
+        return serializer.data
 
     def get_viewer_can_see(self, obj):
         viewing_user = self.context['request'].user
