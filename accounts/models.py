@@ -80,6 +80,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
                                     blank=True)
     bio = models.TextField(max_length=500, blank=True, null=True)
     birthday = models.DateField(null=True, blank=True)
+    phone_number = models.CharField(max_length=30, blank=True)
 
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     modified = models.DateTimeField(_('last modified'), auto_now=True)

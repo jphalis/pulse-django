@@ -23,7 +23,7 @@ class FollowerSerializer(serializers.HyperlinkedModelSerializer):
 class PhotoCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photo
-        fields = ('user', 'photo',)
+        fields = ('photo',)
 
 
 class PhotoSerializer(serializers.HyperlinkedModelSerializer):
@@ -69,8 +69,8 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MyUser
         fields = ('id', 'account_url', 'gender', 'full_name', 'email',
-                  'profile_pic', 'photos', 'bio', 'birthday', 'viewer_can_see',
-                  'follower', 'event_count', 'event_images',)
+                  'profile_pic', 'photos', 'bio', 'birthday', 'phone_number',
+                  'viewer_can_see', 'follower', 'event_count', 'event_images',)
 
     def get_account_url(self, obj):
         request = self.context['request']

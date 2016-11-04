@@ -61,6 +61,8 @@ class APIHomeView(AdminRequiredMixin, CacheMixin, DefaultsMixin, APIView):
                 'profile_url': api_reverse('user_account_detail_api',
                                            request=request,
                                            kwargs={'user_pk': user.pk}),
+                'photo_upload': api_reverse('photo_create_api',
+                                            request=request)
             },
             'feed': {
                 'url': api_reverse('feed_list_api',
@@ -135,9 +137,8 @@ class PhotoCreateAPIView(ModelViewSet):
     parser_classes = (MultiPartParser, FormParser,)
 
     def perform_create(self, serializer):
-        user = self.request.user
-        user.save()
-        serializer.save(user=user, photo=self.request.data.get('photo'))
+        serializer.save(user=self.request.user,
+                        photo=self.request.data.get('photo'))
 
 
 @api_view(['POST'])

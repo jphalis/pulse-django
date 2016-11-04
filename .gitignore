@@ -10,6 +10,7 @@ __pycache__/
 # Extra files
 dev.py
 media/
+.env
 .DS_Store
 ./fabfile/
 hosts.json
