@@ -6,6 +6,7 @@ from parties.models import Party
 
 class PartySerializer(serializers.HyperlinkedModelSerializer):
     party_url = serializers.SerializerMethodField()
+    user_url = serializers.SerializerMethodField()
     user = serializers.CharField(source='user.full_name', read_only=True)
     user_profile_pic = serializers.ImageField(source='user.profile_pic')
     party_type = serializers.SerializerMethodField()
@@ -16,7 +17,7 @@ class PartySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Party
-        fields = ('id', 'party_url', 'user', 'user_profile_pic',
+        fields = ('id', 'party_url', 'user_url', 'user', 'user_profile_pic',
                   'party_type', 'invite_type', 'name', 'location',
                   'latitude', 'longitude', 'party_size', 'party_month',
                   'party_day', 'party_year', 'start_time', 'end_time',
