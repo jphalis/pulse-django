@@ -484,7 +484,7 @@ class UserPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
 @api_view(['POST'])
 def party_attend_api(request, party_pk):
     user = request.user
-    party = Party.objects.get(pk=party_pk)
+    party = get_object_or_404(Party, pk=party_pk)
 
     if user in party.attendees.all():
         party.attendees.remove(user)
@@ -518,8 +518,8 @@ def party_attend_api(request, party_pk):
 
 @api_view(['POST'])
 def requester_approve_api(request, party_pk, user_pk):
-    user = MyUser.objects.get(pk=user_pk)
-    party = Party.objects.get(pk=party_pk)
+    user = get_object_or_404(MyUser, pk=user_pk)
+    party = get_object_or_404(Party, pk=party_pk)
     party_creator = party.user
     party.attendees.add(user)
     party.requesters.remove(user)
@@ -541,8 +541,8 @@ def requester_approve_api(request, party_pk, user_pk):
 
 @api_view(['POST'])
 def requester_deny_api(request, party_pk, user_pk):
-    user = MyUser.objects.get(pk=user_pk)
-    party = Party.objects.get(pk=party_pk)
+    user = get_object_or_404(MyUser, pk=user_pk)
+    party = get_object_or_404(Party, pk=party_pk)
     party_creator = party.user
     party.requesters.remove(user)
     party.save()
@@ -552,5 +552,19 @@ def requester_deny_api(request, party_pk, user_pk):
         verb='has denied your request to attend',
         target=party,
     )
+    serializer = PartySerializer(party, context={'request': request})
+    return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def party_like_api(request, party_pk):
+    user = request.user
+    party = get_object_or_404(Party, pk=party_pk)
+
+    if user in party.likers.all():
+        party.likers.remove(user)
+    else:
+        party.likers.add(user)
+
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)

@@ -159,6 +159,9 @@ class Party(TimeStampedModel):
     invited_users = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                            related_name='invited_users',
                                            blank=True)
+    likers = models.ManyToManyField(settings.AUTH_USER_MODEL,
+                                    related_name='likers',
+                                    blank=True)
 
     is_active = models.BooleanField(_('active'), default=True)
 
@@ -186,6 +189,13 @@ class Party(TimeStampedModel):
         Returns the information for each requester of the party.
         """
         return self.requesters.values('id', 'full_name', 'profile_pic',)
+
+    @cached_property
+    def get_likers_info(self):
+        """
+        Returns the information for each liker of the party.
+        """
+        return self.likers.values('id', 'full_name',)
 
     @cached_property
     def get_invited_users_info(self):
