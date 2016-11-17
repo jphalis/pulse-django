@@ -490,27 +490,28 @@ def party_attend_api(request, party_pk):
         party.attendees.remove(user)
     elif party.invite_type == Party.INVITE_ONLY:
         party.requesters.add(user)
-        party_creator = party.user
         notify.send(
             user,
-            recipient=party_creator,
+            recipient=party.user,
             verb='has requested to attend your party',
             target=party,
         )
     else:
         party.attendees.add(user)
         party_creator = party.user
-        notify.send(
-            user,
-            recipient=party_creator,
-            verb='will be attending your party',
-            target=party,
-        )
-        feed_item.send(
-            user,
-            verb='is attending {0}\'s party'.format(party_creator.get_full_name),
-            target=party,
-        )
+        if user != party_creator:
+            notify.send(
+                user,
+                recipient=party_creator,
+                verb='will be attending your party',
+                target=party,
+            )
+            feed_item.send(
+                user,
+                verb='is attending {0}\'s party'.format(
+                    party_creator.get_full_name),
+                target=party,
+            )
     party.save()
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
