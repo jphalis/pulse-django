@@ -390,7 +390,7 @@ class PartyCreateAPIView(ModelViewSet):
                 notify.send(
                     user,
                     recipient=invited,
-                    verb='has invited you to their party',
+                    verb='has invited you to their event',
                     target=party,
                 )
         party.attendees.add(user)
@@ -418,11 +418,6 @@ class PartyDetailAPIView(CacheMixin,
             int(obj.end_time.strftime('%H')), int(obj.end_time.strftime('%M')))
 
         if expires_on <= datetime.now():
-            party_expired = True
-        else:
-            party_expired = False
-
-        if party_expired:
             obj.is_active = False
         else:
             obj.is_active = True
@@ -477,38 +472,43 @@ class UserPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     ordering_fields = ('created', 'modified',)
 
     def get_queryset(self):
-        user = MyUser.objects.get(pk=self.kwargs['user_pk'])
-        return Party.objects.own_parties_hosting(user=user)
+        return Party.objects.own_parties_hosting(
+            user=MyUser.objects.get(pk=self.kwargs['user_pk']))
 
 
 @api_view(['POST'])
 def party_attend_api(request, party_pk):
     user = request.user
     party = get_object_or_404(Party, pk=party_pk)
+    party_creator = party.user
 
     if user in party.attendees.all():
         party.attendees.remove(user)
     elif party.invite_type == Party.INVITE_ONLY:
-        party.requesters.add(user)
-        notify.send(
-            user,
-            recipient=party.user,
-            verb='has requested to attend your party',
-            target=party,
-        )
+
+        if user == party_creator:
+            party.attendees.add(user)
+        else:
+            party.requesters.add(user)
+            notify.send(
+                user,
+                recipient=party.user,
+                verb='has requested to attend your event',
+                target=party,
+            )
     else:
         party.attendees.add(user)
-        party_creator = party.user
+
         if user != party_creator:
             notify.send(
                 user,
                 recipient=party_creator,
-                verb='will be attending your party',
+                verb='will be attending your event',
                 target=party,
             )
             feed_item.send(
                 user,
-                verb='is attending {0}\'s party'.format(
+                verb='is attending {0}\'s event'.format(
                     party_creator.get_full_name),
                 target=party,
             )
@@ -533,7 +533,7 @@ def requester_approve_api(request, party_pk, user_pk):
     )
     feed_item.send(
         user,
-        verb='is attending {0}\'s party'.format(party_creator.get_full_name),
+        verb='is attending {0}\'s event'.format(party_creator.get_full_name),
         target=party,
     )
     serializer = PartySerializer(party, context={'request': request})
@@ -547,12 +547,12 @@ def requester_deny_api(request, party_pk, user_pk):
     party_creator = party.user
     party.requesters.remove(user)
     party.save()
-    notify.send(
-        party_creator,
-        recipient=user,
-        verb='has denied your request to attend',
-        target=party,
-    )
+    # notify.send(
+    #     party_creator,
+    #     recipient=user,
+    #     verb='has denied your request to attend',
+    #     target=party,
+    # )
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
 
