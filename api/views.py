@@ -397,7 +397,7 @@ class PartyCreateAPIView(ModelViewSet):
         party.save()
         feed_item.send(
             user,
-            verb='created an event',
+            verb='are hosting an event.',
             target=party,
         )
 
@@ -508,7 +508,7 @@ def party_attend_api(request, party_pk):
             )
             feed_item.send(
                 user,
-                verb='is attending {0}\'s event'.format(
+                verb='will be attending {0}\'s event'.format(
                     party_creator.get_full_name),
                 target=party,
             )
