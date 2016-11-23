@@ -27,9 +27,9 @@ def new_notification(sender, **kwargs):
                     try:
                         obj = kwargs[option]
                         if obj is not None:
-                            setattr(new_note, "{0}_content_type".format(option),
+                            setattr(new_note, "{}_content_type".format(option),
                                     ContentType.objects.get_for_model(obj))
-                            setattr(new_note, "{0}_object_id".format(option),
+                            setattr(new_note, "{}_object_id".format(option),
                                     obj.id)
                     except:
                         pass
@@ -48,5 +48,6 @@ def new_notification(sender, **kwargs):
                             ContentType.objects.get_for_model(obj))
                     setattr(new_note, "{0}_object_id".format(option), obj.id)
             new_note.save()
+
 
 notify.connect(new_notification)

@@ -7,7 +7,9 @@
         <br/><br/>
         <img class="pulse-logo" src="{% static 'img/pulse-logo.png' %}" alt="Pulse logo" />
         {% if request.user.is_superuser %}
-            <a href="{% url 'generate_rand_data' %}"><h3>Generate Random Data</h3></a>
+            <a href="{% url 'generate_rand_data' %}">
+                <h3>Generate Random Data</h3>
+            </a>
         {% endif %}
     </div>
 {% endblock content %}

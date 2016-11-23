@@ -44,7 +44,7 @@ def generate_rand_data(request):
 
         for num in range(20):
             MyUser.objects.create_user(
-                email='{0}@sample.com'.format(randomword(7)),
+                email='{}@sample.com'.format(randomword(7)),
                 full_name='{0} {1}'.format(randomword(5), randomword(8)),
                 password='abc1234')
 
@@ -122,7 +122,7 @@ def generate_rand_data(request):
                 )
                 feed_item.send(
                     attendee,
-                    verb='will be attending {0}\'s party'.format(
+                    verb='will be attending {}\'s party'.format(
                         party.user.get_full_name),
                     target=party,
                 )
@@ -141,7 +141,7 @@ def generate_rand_data(request):
         )
         feed_item.send(
             viewing_user,
-            verb='will be attending {0}\'s party'.format(
+            verb='will be attending {}\'s party'.format(
                 the_user.get_full_name),
             target=party,
         )

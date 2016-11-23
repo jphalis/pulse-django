@@ -36,9 +36,8 @@ class PhotoSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_user_url(self, obj):
         request = self.context['request']
-        kwargs = {'user_pk': obj.user.pk}
         return api_reverse('user_account_detail_api',
-                           kwargs=kwargs, request=request)
+                           kwargs={'user_pk': obj.user.pk}, request=request)
 
 
 class AccountCreateSerializer(serializers.ModelSerializer):
@@ -74,9 +73,8 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_account_url(self, obj):
         request = self.context['request']
-        kwargs = {'user_pk': obj.pk}
-        return api_reverse('user_account_detail_api', kwargs=kwargs,
-                           request=request)
+        return api_reverse('user_account_detail_api',
+                           kwargs={'user_pk': obj.pk}, request=request)
 
     def get_gender(self, obj):
         return dict(MyUser.GENDER_CHOICES)[obj.gender]

@@ -16,34 +16,33 @@ class NotificationManager(models.Manager):
         """
         Returns all of the notifications for the user.
         """
-        return super(NotificationManager, self).get_queryset() \
-            .filter(recipient=user)
+        return super(NotificationManager, self).get_queryset().filter(
+            recipient=user)
 
     def read_for_user(self, user):
         """
         Returns all of the read notifications for the user.
         """
-        return super(NotificationManager, self).get_queryset() \
-            .filter(recipient=user, read=True)
+        return super(NotificationManager, self).get_queryset().filter(
+            recipient=user, read=True)
 
     def unread_for_user(self, user):
         """
         Returns all of the unread notifications for the user.
         """
-        return super(NotificationManager, self).get_queryset() \
-            .filter(recipient=user, read=False)
+        return super(NotificationManager, self).get_queryset().filter(
+            recipient=user, read=False)
 
     def get_recent_for_user(self, user, num):
         r"""
         Returns N (num) recent notifications for the user.
         """
-        return super(NotificationManager, self).get_queryset() \
-            .filter(recipient=user)[:num]
+        return super(NotificationManager, self).get_queryset().filter(
+            recipient=user)[:num]
 
     def mark_all_read(self, user):
         return super(NotificationManager, self).get_queryset() \
-            .filter(recipient=user) \
-            .update(read=True)
+            .filter(recipient=user).update(read=True)
 
 
 @python_2_unicode_compatible
@@ -91,10 +90,6 @@ class Notification(TimeStampedModel):
             if self.action_object:
                 if self.verb == "commented":
                     return "%(verb)s: '%(action)s'" % context
-                # Other
-                else:
-                    return "%(verb)s %(action)s" % context
-        else:
-            # No target object
+                return "%(verb)s %(action)s" % context
             return "%(verb)s" % context
         return "%(verb)s" % context

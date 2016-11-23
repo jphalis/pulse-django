@@ -13,7 +13,17 @@
 
         <!-- CSS -->
         <link href="{% static 'vendors/bootstrap/bootstrap.min.css' %}" rel="stylesheet" media="screen">
-        <link href="{% static 'custom/css/pulse.css' %}" rel="stylesheet" media="screen">
+        <style>
+            body {
+                background:#292E32;
+                color:#fff; }
+            .main-section {
+                text-align:center;
+                margin-top:5%; }
+            .pulse-logo {
+                width: 18%;
+                height: 18%; }
+        </style>
         <style>{% block style %}{% endblock style %}</style>
     </head>
 
@@ -23,7 +33,7 @@
             <div class="container">
                 {% if messages %}
                     {% for message in messages %}
-                        <div role="alert" style="text-align: center;" class="alert alert-dismissible 
+                        <div role="alert" style="text-align: center;" class="alert alert-dismissible
                             {% if 'success' in message.tags %}
                                 alert-success
                             {% elif 'info' in message.tags %}

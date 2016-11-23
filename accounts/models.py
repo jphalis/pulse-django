@@ -122,8 +122,8 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
     @property
     def user_profile_pic(self):
         """
-        Returns the profile picture of a user. If there is no profile picture,
-        a default one will be rendered.
+        Returns the profile picture of a user. If there is no
+        profile picture, a default one will be rendered.
         """
         if self.profile_pic:
             return "{0}{1}".format(settings.MEDIA_URL, self.profile_pic)

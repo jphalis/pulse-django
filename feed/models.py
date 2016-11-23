@@ -27,26 +27,23 @@ class FeedManager(models.Manager):
         if follow:
             if follow.following.count() == 0:
                 return own_feed
-            else:
-                following_feed = self.following_for_user(user=user)
-                return (own_feed | following_feed).distinct()
-        else:
-            return own_feed
+            following_feed = self.following_for_user(user=user)
+            return (own_feed | following_feed).distinct()
+        return own_feed
 
     def following_for_user(self, user):
         """
         Returns all of the feed items for the users the user is following.
         """
-        return super(FeedManager, self).get_queryset() \
-            .filter(
-                sender_object_id__in=user.follower.following.values('user_id'))
+        return super(FeedManager, self).get_queryset().filter(
+            sender_object_id__in=user.follower.following.values('user_id'))
 
     def own_for_user(self, user):
         """
         Returns all of the feed items the user has created.
         """
-        return super(FeedManager, self).get_queryset() \
-            .filter(sender_object_id=user.id)
+        return super(FeedManager, self).get_queryset().filter(
+            sender_object_id=user.id)
 
     def recent_for_user(self, user, num):
         """
@@ -95,8 +92,4 @@ class Feed(TimeStampedModel):
 
     @property
     def time_since(self):
-        # timediff = timezone.now() - self.created
-        # time = readable_number(
-        #     round(timediff.total_seconds() / 60), short=True)
-        # return "{0} m".format(time)
         return naturaltime(self.created)

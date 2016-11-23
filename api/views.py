@@ -116,10 +116,9 @@ class MyUserDetailAPIView(CacheMixin,
     parser_classes = (MultiPartParser, FormParser,)
 
     def get_object(self):
-        viewing_user = self.request.user
         obj = get_object_or_404(MyUser, pk=self.kwargs["user_pk"])
 
-        if viewing_user in obj.blocking.all():
+        if self.request.user in obj.blocking.all():
             raise PermissionDenied(
                 "You do not have permission to view that profile.")
         return obj
@@ -214,11 +213,8 @@ def block_user_api(request, user_pk):
 @api_view(['POST'])
 def privacy_status_api(request, user_pk):
     user = get_object_or_404(MyUser, pk=user_pk)
-    if user.is_private:
-        user.is_private = False
-    else:
-        user.is_private = True
-    user.save()
+    user.is_private = False if user.is_private else True
+    user.save(update_fields=['is_private'])
     serializer = MyUserSerializer(user, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -285,8 +281,7 @@ class FeedAPIView(CacheMixin, DefaultsMixin, generics.ListAPIView):
     serializer_class = FeedSerializer
 
     def get_queryset(self):
-        user = self.request.user
-        return Feed.objects.recent_for_user(user=user, num=50)
+        return Feed.objects.recent_for_user(user=self.request.user, num=50)
 
 
 ########################################################################
@@ -303,7 +298,7 @@ def flag_create_api(request, party_pk):
     flagged.save()
 
     party_creator.times_flagged = F('times_flagged') + 1
-    party_creator.save()
+    party_creator.save(update_fields=['times_flagged'])
 
     send_mail('FLAGGED ITEM',
               'There is a new flagged item with the id: {}'.format(flagged.id),
@@ -411,18 +406,12 @@ class PartyDetailAPIView(CacheMixin,
     serializer_class = PartySerializer
 
     def get_object(self):
-        party_pk = self.kwargs["party_pk"]
-        obj = get_object_or_404(Party, pk=party_pk)
+        obj = get_object_or_404(Party, pk=self.kwargs["party_pk"])
         expires_on = datetime(
             obj.party_year, obj.party_month, obj.party_day,
             int(obj.end_time.strftime('%H')), int(obj.end_time.strftime('%M')))
-
-        if expires_on <= datetime.now():
-            obj.is_active = False
-        else:
-            obj.is_active = True
-
-        obj.save()
+        obj.is_active = False if expires_on <= datetime.now() else True
+        obj.save(update_fields=['is_active'])
         return obj
 
     def delete(self, request, *args, **kwargs):
@@ -440,11 +429,10 @@ class PartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     search_fields = ('user__email', 'user__full_name',
                      'attendees__email', 'attendees__full_name',
                      'requesters__email', 'requesters__full_name',)
-    ordering_fields = ('created', 'modified',)
+    ordering_fields = ('created',)
 
     def get_queryset(self):
-        return Party.objects.all().filter(
-            is_active=True).exclude(party_type=Party.INVITE_ONLY)
+        return Party.objects.active().exclude(party_type=Party.INVITE_ONLY)
 
 
 class OwnPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
@@ -455,7 +443,7 @@ class OwnPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     search_fields = ('user__email', 'user__full_name',
                      'attendees__email', 'attendees__full_name',
                      'requesters__email', 'requesters__full_name',)
-    ordering_fields = ('created', 'modified',)
+    ordering_fields = ('created',)
 
     def get_queryset(self):
         return Party.objects.own_parties_hosting(user=self.request.user)
@@ -469,7 +457,7 @@ class UserPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     search_fields = ('user__email', 'user__full_name',
                      'attendees__email', 'attendees__full_name',
                      'requesters__email', 'requesters__full_name',)
-    ordering_fields = ('created', 'modified',)
+    ordering_fields = ('created',)
 
     def get_queryset(self):
         return Party.objects.own_parties_hosting(
@@ -542,17 +530,9 @@ def requester_approve_api(request, party_pk, user_pk):
 
 @api_view(['POST'])
 def requester_deny_api(request, party_pk, user_pk):
-    user = get_object_or_404(MyUser, pk=user_pk)
     party = get_object_or_404(Party, pk=party_pk)
-    party_creator = party.user
-    party.requesters.remove(user)
+    party.requesters.remove(get_object_or_404(MyUser, pk=user_pk))
     party.save()
-    # notify.send(
-    #     party_creator,
-    #     recipient=user,
-    #     verb='has denied your request to attend',
-    #     target=party,
-    # )
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
 

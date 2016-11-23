@@ -97,6 +97,7 @@ urlpatterns = [
     url(r'^party/deny/(?P<party_pk>\d+)/(?P<user_pk>\d+)/$',
         views.requester_deny_api,
         name='requester_deny_api'),
-    url(r'^party/like/(?P<party_pk>\d+)/$', views.party_like_api,
+    url(r'^party/like/(?P<party_pk>\d+)/$',
+        views.party_like_api,
         name='party_like_api'),
 ]

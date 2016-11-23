@@ -56,11 +56,12 @@ class ChangePasswordForm(forms.Form):
         return self.cleaned_data["password_current"]
 
     def clean_password_new_confirm(self):
-        if "password_new" in self.cleaned_data and "password_new_confirm" in self.cleaned_data:
-            if self.cleaned_data["password_new"] != self.cleaned_data["password_new_confirm"]:
+        _data = self.cleaned_data
+        if "password_new" in _data and "password_new_confirm" in _data:
+            if _data["password_new"] != _data["password_new_confirm"]:
                 raise forms.ValidationError(
                     _("You must type the same password each time."))
-        return self.cleaned_data["password_new_confirm"]
+        return _data["password_new_confirm"]
 
 
 class MyUserChangeForm(UserChangeForm):
@@ -198,11 +199,12 @@ class PasswordResetTokenForm(forms.Form):
         super(PasswordResetTokenForm, self).__init__(*args, **kwargs)
 
     def clean_password_confirm(self):
-        if 'password' in self.cleaned_data and 'password_confirm' in self.cleaned_data:
-            if self.cleaned_data["password"] != self.cleaned_data['password_confirm']:
+        _data = self.cleaned_data
+        if 'password' in _data and 'password_confirm' in _data:
+            if _data["password"] != _data['password_confirm']:
                 raise forms.ValidationError(
                     _('You must type the same password each time.'))
-        return self.cleaned_data["password_confirm"]
+        return _data["password_confirm"]
 
     def save(self, commit=True):
         """

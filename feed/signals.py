@@ -45,4 +45,5 @@ def new_feed_item(sender, **kwargs):
                 setattr(new_item, "{0}_object_id".format(option), obj.id)
         new_item.save()
 
+
 feed_item.connect(new_feed_item)

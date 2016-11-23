@@ -19,21 +19,18 @@ class NotificationSerializer(serializers.HyperlinkedModelSerializer):
                   'created', 'modified',)
 
     def get_recipient_url(self, obj):
-        request = self.context['request']
-        kwargs = {'user_pk': obj.recipient.pk}
-        return api_reverse('user_account_detail_api', kwargs=kwargs,
-                           request=request)
+        return api_reverse('user_account_detail_api',
+                           kwargs={'user_pk': obj.recipient.pk},
+                           request=self.context['request'])
 
     def get_sender_url(self, obj):
-        request = self.context['request']
-        kwargs = {'user_pk': obj.sender_object.pk}
-        return api_reverse('user_account_detail_api', kwargs=kwargs,
-                           request=request)
+        return api_reverse('user_account_detail_api',
+                           kwargs={'user_pk': obj.sender_object.pk},
+                           request=self.context['request'])
 
     def get_target_url(self, obj):
-        request = self.context['request']
         if obj.target_object:
-            view_name = "party_detail_api"
-            kwargs = {'party_pk': obj.target_object.pk}
-            return api_reverse(view_name, kwargs=kwargs, request=request)
+            return api_reverse('party_detail_api',
+                               kwargs={'party_pk': obj.target_object.pk},
+                               request=self.context['request'])
         return None
