@@ -4,8 +4,21 @@ from django.shortcuts import redirect
 # Create views here.
 
 
+def estimate_count_fast(type):
+    from django.db import connections
+    cursor = connections['default'].cursor()
+    # cursor.execute("select reltuples from pg_class where relname='%s';" % type)
+    cursor.execute("SELECT schemaname, relname, n_live_tup FROM pg_stat_user_tables ORDER BY n_live_tup DESC;")
+    # cursor.execute("SELECT schemaname,relname,n_live_tup FROM pg_stat_user_tables ORDER BY n_live_tup DESC;")
+    row = cursor.fetchone()
+    # return int(row[0])
+    return row
+
+
 def home(request):
-    return render(request, 'index.html', {'domain': request.get_host()})
+    count = estimate_count_fast('accounts_myuser')
+
+    return render(request, 'index.html', {'domain': request.get_host(), 'count': count})
 
 
 def privacy_policy(request):
