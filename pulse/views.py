@@ -8,8 +8,8 @@ def estimate_count_fast(type):
     from django.db import connections
     cursor = connections['default'].cursor()
     # cursor.execute("select reltuples from pg_class where relname='%s';" % type)
-    cursor.execute("SELECT schemaname, relname, n_live_tup FROM pg_stat_user_tables ORDER BY n_live_tup DESC;")
-    # cursor.execute("SELECT schemaname,relname,n_live_tup FROM pg_stat_user_tables ORDER BY n_live_tup DESC;")
+    # cursor.execute("SELECT schemaname, relname, n_live_tup FROM pg_stat_user_tables ORDER BY n_live_tup DESC;")
+    cursor.execute("SELECT sum(reltuples) from pg_class where relname IN (SELECT c.relname FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind = 'r' AND n.nspname <> 'pg_catalog' AND n.nspname <> 'information_schema' AND n.nspname !~ '^pg_toast' AND pg_catalog.pg_table_is_visible(c.oid));")
     row = cursor.fetchone()
     # return int(row[0])
     return row
