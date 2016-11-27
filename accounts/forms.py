@@ -50,10 +50,11 @@ class ChangePasswordForm(forms.Form):
         super(ChangePasswordForm, self).__init__(*args, **kwargs)
 
     def clean_password_current(self):
-        if not self.user.check_password(self.cleaned_data.get("password_current")):
+        _data = self.cleaned_data
+        if not self.user.check_password(_data.get("password_current")):
             raise forms.ValidationError(
                 _("Please type your current password."))
-        return self.cleaned_data["password_current"]
+        return _data["password_current"]
 
     def clean_password_new_confirm(self):
         _data = self.cleaned_data
@@ -92,8 +93,8 @@ class MyUserChangeForm(UserChangeForm):
 
 class MyUserCreationForm(UserCreationForm):
     """
-    A form that creates a user, with no privileges, from the given email and
-    password.
+    A form that creates a user, with no privileges, from the given email
+    and password.
     """
     def __init__(self, *args, **kargs):
         super(MyUserCreationForm, self).__init__(*args, **kargs)
@@ -119,8 +120,7 @@ class MyUserCreationForm(UserCreationForm):
 class PasswordResetForm(forms.Form):
     email = forms.EmailField(
         label=_("Email"),
-        widget=forms.widgets.EmailInput(
-            attrs={'placeholder': 'Email'}),
+        widget=forms.widgets.EmailInput(attrs={'placeholder': 'Email'}),
         required=True
     )
 
@@ -182,8 +182,8 @@ class PasswordResetForm(forms.Form):
 
 class PasswordResetTokenForm(forms.Form):
     """
-    A form that lets a user change set their password without entering the old
-    password.
+    A form that lets a user change set their password without entering
+    the old password.
     """
     password = forms.CharField(
         label=_('New Password'),
@@ -208,8 +208,8 @@ class PasswordResetTokenForm(forms.Form):
 
     def save(self, commit=True):
         """
-        Saves the form and sets the user's password to be the value he/she
-        typed in.
+        Saves the form and sets the user's password to be the value
+        he/she typed in.
         """
         self.user.set_password(self.cleaned_data["password_confirm"])
         if commit:

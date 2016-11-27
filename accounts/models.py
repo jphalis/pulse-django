@@ -196,4 +196,5 @@ class Follower(TimeStampedModel):
     def following_count(self):
         return str(self.get_following_info.count())
 
+
 MyUser.profile = property(lambda u: Follower.objects.get_or_create(user=u)[0])

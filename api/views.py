@@ -389,7 +389,6 @@ class PartyCreateAPIView(ModelViewSet):
                     target=party,
                 )
         party.attendees.add(user)
-        party.save()
         feed_item.send(
             user,
             verb='are hosting an event.',
@@ -512,7 +511,6 @@ def requester_approve_api(request, party_pk, user_pk):
     party_creator = party.user
     party.attendees.add(user)
     party.requesters.remove(user)
-    party.save()
     notify.send(
         party_creator,
         recipient=user,
@@ -532,7 +530,6 @@ def requester_approve_api(request, party_pk, user_pk):
 def requester_deny_api(request, party_pk, user_pk):
     party = get_object_or_404(Party, pk=party_pk)
     party.requesters.remove(get_object_or_404(MyUser, pk=user_pk))
-    party.save()
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
 

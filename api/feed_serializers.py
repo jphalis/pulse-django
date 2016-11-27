@@ -17,15 +17,13 @@ class FeedSerializer(serializers.HyperlinkedModelSerializer):
                   '__str__', 'target_url', 'created', 'time_since',)
 
     def get_sender_url(self, obj):
-        request = self.context['request']
         return api_reverse('user_account_detail_api',
                            kwargs={'user_pk': obj.sender_object.pk},
-                           request=request)
+                           request=self.context['request'])
 
     def get_target_url(self, obj):
-        request = self.context['request']
         if obj.target_object:
             return api_reverse('party_detail_api',
                                kwargs={'party_pk': obj.target_object.pk},
-                               request=request)
+                               request=self.context['request'])
         return None

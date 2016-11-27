@@ -35,9 +35,9 @@ class PhotoSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'user', 'user_url', 'photo', 'created', 'modified',)
 
     def get_user_url(self, obj):
-        request = self.context['request']
         return api_reverse('user_account_detail_api',
-                           kwargs={'user_pk': obj.user.pk}, request=request)
+                           kwargs={'user_pk': obj.user.pk},
+                           request=self.context['request'])
 
 
 class AccountCreateSerializer(serializers.ModelSerializer):

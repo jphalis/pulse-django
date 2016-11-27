@@ -88,7 +88,6 @@ class PartyManager(models.Manager):
                            **extra_fields)
         party.save(using=self._db)
         party.attendees.add(user)
-        party.save()
         return party
 
 
