@@ -6,10 +6,10 @@
     <h1>Welcome to Pulse!</h1>
     <br/><br/>
     <img class="pulse-logo" src="{% static 'img/pulse-logo.png' %}" alt="Pulse logo" />
-    {% if request.user.is_superuser %}
+    {# {% if request.user.is_superuser %}
       <a href="{% url 'generate_rand_data' %}">
         <h3>Generate Random Data</h3>
       </a>
-    {% endif %}
+    {% endif %} #}
   </div>
 {% endblock content %}
