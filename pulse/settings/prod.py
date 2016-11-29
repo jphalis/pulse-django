@@ -28,19 +28,19 @@ FULL_DOMAIN = 'pulse-ios.herokuapp.com'
 ALLOWED_HOSTS = [
     '127.0.0.1',
     '*{}'.format(FULL_DOMAIN),
-    'wwww.{}'.format(FULL_DOMAIN),
     '*.{}'.format(FULL_DOMAIN),
+    'wwww.{}'.format(FULL_DOMAIN),
     FULL_DOMAIN,
 ]
 CORS_URLS_REGEX = r'^/hidden/secure/pulse/api/.*$'
 
 
 # E M A I L
-DEFAULT_FROM_EMAIL = ''
+DEFAULT_FROM_EMAIL = 'pulsenoreply@gmail.com'
 DEFAULT_HR_EMAIL = DEFAULT_FROM_EMAIL
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
+EMAIL_HOST_PASSWORD = 'lukefranktj'
 EMAIL_PORT = 587
 
 
@@ -65,7 +65,7 @@ INSTALLED_APPS += (
 
 # D A T A B A S E
 DATABASES = {
-    'default': {  # get credentials from Heroku database creation
+    'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': '',
         'USER': '',
