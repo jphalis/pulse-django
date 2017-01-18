@@ -23,7 +23,8 @@ from notifications.models import Notification
 from notifications.signals import notify
 from parties.models import Party
 from .account_serializers import (AccountCreateSerializer, FollowerSerializer,
-                                  MyUserSerializer, PhotoCreateSerializer)
+                                  MyUserSerializer, PhotoCreateSerializer,
+                                  PhotoSerializer)
 from .auth_serializers import (PasswordResetSerializer,
                                PasswordResetConfirmSerializer,
                                PasswordChangeSerializer)
@@ -138,6 +139,14 @@ class PhotoCreateAPIView(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user,
                         photo=self.request.data.get('photo'))
+
+
+@api_view(['DELETE'])
+def photo_delete_api(request, photo_pk):
+    photo = get_object_or_404(Photo, pk=photo_pk)
+    photo.delete()
+    serializer = PhotoSerializer(photo, context={'request': request})
+    return RestResponse(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -391,7 +400,7 @@ class PartyCreateAPIView(ModelViewSet):
         party.attendees.add(user)
         feed_item.send(
             user,
-            verb='are hosting an event.',
+            verb='hosting an event.',
             target=party,
         )
 
