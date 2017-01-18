@@ -177,7 +177,7 @@ def follow_status_api(request, user_pk):
             viewing_user.blocking.remove(user)
 
     serializer = FollowerSerializer(followed, context={'request': request})
-    return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
+    return RestResponse(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
