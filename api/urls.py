@@ -11,12 +11,15 @@ from .views import (PasswordChangeView, PasswordResetView,
                     PasswordResetConfirmView)
 from .views import (OwnPartyListAPIView, PartyCreateAPIView,
                     PartyDetailAPIView, PartyListAPIView, UserPartyListAPIView)
+from .views import SearchListAPIView
 
 
 urlpatterns = [
     # G E N E R A L
     url(r'^$', APIHomeView.as_view(),
         name='api_home'),
+    url(r'^search/$', SearchListAPIView.as_view(),
+        name='search_api'),
 
     # A C C O U N T S
     url(r'^accounts/$',

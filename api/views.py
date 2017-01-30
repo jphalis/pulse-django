@@ -35,6 +35,7 @@ from .pagination import (AccountPagination, NotificationPagination,
                          PartyPagination)
 from .party_serializers import PartyCreateSerializer, PartySerializer
 from .permissions import IsOwnerOrReadOnly, MyUserIsOwnerOrReadOnly
+from .search_serializers import SearchMyUserSerializer
 
 # Create your views here.
 
@@ -84,6 +85,11 @@ class APIHomeView(AdminRequiredMixin, CacheMixin, DefaultsMixin, APIView):
                                           request=request),
                 'own_parties': api_reverse('own_party_list_api',
                                            request=request),
+            },
+            'search': {
+                'url': api_reverse('search_api', request=request),
+                'help_text': "add '?q=searched_parameter' to the "
+                             "end of the url to display results"
             },
         }
         return RestResponse(data)
@@ -555,3 +561,19 @@ def party_like_api(request, party_pk):
 
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
+
+
+########################################################################
+# SEARCH                                                               #
+########################################################################
+class SearchListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
+                        generics.ListAPIView):
+    serializer_class = SearchMyUserSerializer
+    # '^' Starts-with search
+    # '=' Exact matches
+    # '$' Regex search
+    search_fields = ('^full_name',)
+
+    def get_queryset(self):
+        return MyUser.objects.filter(is_active=True).only(
+            'id', 'full_name', 'profile_pic')
