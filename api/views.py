@@ -511,12 +511,12 @@ def party_attend_api(request, party_pk):
             notify.send(
                 user,
                 recipient=party_creator,
-                verb='will be attending your event',
+                verb='attending your event',
                 target=party,
             )
             feed_item.send(
                 user,
-                verb='will be attending {0}\'s event'.format(
+                verb='attending {0}\'s event'.format(
                     party_creator.get_full_name),
                 target=party,
             )
@@ -540,7 +540,7 @@ def requester_approve_api(request, party_pk, user_pk):
     )
     feed_item.send(
         user,
-        verb='is attending {0}\'s event'.format(party_creator.get_full_name),
+        verb='attending {0}\'s event'.format(party_creator.get_full_name),
         target=party,
     )
     serializer = PartySerializer(party, context={'request': request})
