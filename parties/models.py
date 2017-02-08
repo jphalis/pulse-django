@@ -50,7 +50,7 @@ class PartyManager(models.Manager):
             .prefetch_related('attendees')
 
     def party_create(self, user, party_type, name, location, party_size,
-                     party_month, party_day, start_time, end_time,
+                     party_month, party_day, start_time, end_time=None,
                      description=None, image=None, **extra_fields):
         """
         Creates a party.
@@ -71,8 +71,6 @@ class PartyManager(models.Manager):
             raise ValueError('There must be a day for the party.')
         elif not start_time:
             raise ValueError('There must be a start time for the party.')
-        elif not end_time:
-            raise ValueError('There must be an end time for the party.')
 
         party = self.model(user=user,
                            party_type=party_type,
@@ -142,7 +140,7 @@ class Party(TimeStampedModel):
         validators=[MaxValueValidator(31)])
     party_year = models.PositiveIntegerField(default=date.today().year)
     start_time = models.TimeField(verbose_name='Start Time')
-    end_time = models.TimeField(verbose_name='End Time')
+    end_time = models.TimeField(verbose_name='End Time', blank=True, null=True)
     description = models.TextField(max_length=500, blank=True)
     image = models.ImageField(_('party image'), blank=True,
                               upload_to=party_image_upload_loc)
@@ -216,9 +214,3 @@ class Party(TimeStampedModel):
         Returns the number of requesters of the party.
         """
         return str(self.get_requesters_info.count())
-
-    def party_expired(self):
-        expires_on = date(
-            date.today().year, self.party_month, self.party_day)
-        return expires_on <= date(date.today())
-    party_expired.boolean = True

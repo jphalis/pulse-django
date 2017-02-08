@@ -51,7 +51,7 @@ class PartySerializer(serializers.HyperlinkedModelSerializer):
 
     def get_end_time(self, obj):
         # %l:%M %p (removes leading 0)
-        return obj.end_time.strftime("%I:%M %p")
+        return obj.end_time.strftime("%I:%M %p") if obj.end_time else None
 
 
 class PartyCreateSerializer(serializers.ModelSerializer):

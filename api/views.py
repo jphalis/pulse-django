@@ -421,10 +421,16 @@ class PartyDetailAPIView(CacheMixin,
 
     def get_object(self):
         obj = get_object_or_404(Party, pk=self.kwargs["party_pk"])
-        expires_on = datetime(
-            obj.party_year, obj.party_month, obj.party_day,
-            int(obj.end_time.strftime('%H')), int(obj.end_time.strftime('%M')))
-        obj.is_active = False if expires_on <= datetime.now() else True
+        if obj.end_time:
+            expires_on = datetime(
+                obj.party_year, obj.party_month, obj.party_day,
+                int(obj.end_time.strftime('%H')),
+                int(obj.end_time.strftime('%M')))
+            obj.is_active = False if expires_on <= datetime.now() else True
+        else:
+            expires_on = datetime(
+                obj.party_year, obj.party_month, obj.party_day)
+            obj.is_active = True if datetime.today() > expires_on else False
         obj.save(update_fields=['is_active'])
         return obj
 
