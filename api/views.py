@@ -452,7 +452,7 @@ class PartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     ordering_fields = ('created',)
 
     def get_queryset(self):
-        return Party.objects.active().exclude(party_type=Party.INVITE_ONLY)
+        return Party.objects.active().exclude(invite_type=Party.INVITE_ONLY)
 
 
 class OwnPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
@@ -492,8 +492,7 @@ def party_attend_api(request, party_pk):
 
     if user in party.attendees.all():
         party.attendees.remove(user)
-    elif party.invite_type == Party.INVITE_ONLY:
-
+    elif party.invite_type == Party.REQUEST_APPROVAL:
         if user == party_creator:
             party.attendees.add(user)
         else:
@@ -504,14 +503,14 @@ def party_attend_api(request, party_pk):
                 verb='has requested to attend your event',
                 target=party,
             )
-    else:
+    elif party.invite_type == Party.OPEN:
         party.attendees.add(user)
 
         if user != party_creator:
             notify.send(
                 user,
                 recipient=party_creator,
-                verb='attending your event',
+                verb='will be attending your event',
                 target=party,
             )
             feed_item.send(
