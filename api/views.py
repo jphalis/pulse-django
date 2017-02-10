@@ -175,7 +175,7 @@ def follow_status_api(request, user_pk):
         notify.send(
             viewing_user,
             recipient=user,
-            verb='is now following you',
+            verb='is now following you.',
             # target=viewing_user,
         )
 
@@ -400,7 +400,7 @@ class PartyCreateAPIView(ModelViewSet):
                 notify.send(
                     user,
                     recipient=invited,
-                    verb='has invited you to their event',
+                    verb='has invited you to their event.',
                     target=party,
                 )
         party.attendees.add(user)
@@ -491,7 +491,8 @@ def party_attend_api(request, party_pk):
     party_creator = party.user
 
     if user in party.attendees.all():
-        party.attendees.remove(user)
+        # party.attendees.remove(user)
+        pass
     elif party.invite_type == Party.REQUEST_APPROVAL:
         if user == party_creator:
             party.attendees.add(user)
@@ -500,25 +501,40 @@ def party_attend_api(request, party_pk):
             notify.send(
                 user,
                 recipient=party.user,
-                verb='has requested to attend your event',
+                verb='has requested to attend your event.',
                 target=party,
             )
     elif party.invite_type == Party.OPEN:
         party.attendees.add(user)
-
         if user != party_creator:
             notify.send(
                 user,
                 recipient=party_creator,
-                verb='will be attending your event',
+                verb='will be attending your event.',
                 target=party,
             )
             feed_item.send(
                 user,
-                verb='attending {0}\'s event'.format(
+                verb='attending {0}\'s event.'.format(
                     party_creator.get_full_name),
                 target=party,
             )
+    elif party.invite_type == Party.INVITE_ONLY and user in party.invited_users.all():
+        party.attendees.add(user)
+        if user != party_creator:
+            notify.send(
+                user,
+                recipient=party_creator,
+                verb='will be attending your event.',
+                target=party,
+            )
+            feed_item.send(
+                user,
+                verb='attending {0}\'s event.'.format(
+                    party_creator.get_full_name),
+                target=party,
+            )
+
     party.save()
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
@@ -534,12 +550,12 @@ def requester_approve_api(request, party_pk, user_pk):
     notify.send(
         party_creator,
         recipient=user,
-        verb='has accepted your request to attend',
+        verb='has accepted your request to attend.',
         target=party,
     )
     feed_item.send(
         user,
-        verb='attending {0}\'s event'.format(party_creator.get_full_name),
+        verb='attending {0}\'s event.'.format(party_creator.get_full_name),
         target=party,
     )
     serializer = PartySerializer(party, context={'request': request})
