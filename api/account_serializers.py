@@ -69,7 +69,8 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
         model = MyUser
         fields = ('id', 'account_url', 'gender', 'full_name', 'email',
                   'profile_pic', 'photos', 'bio', 'birthday', 'phone_number',
-                  'viewer_can_see', 'follower', 'event_count', 'event_images',)
+                  'location', 'viewer_can_see', 'follower', 'event_count',
+                  'event_images',)
 
     def get_account_url(self, obj):
         request = self.context['request']
