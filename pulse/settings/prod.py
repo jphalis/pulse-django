@@ -15,8 +15,6 @@ Glossary of settings/prod.py:
 from .common import *
 import dj_database_url
 
-DEBUG = True
-
 
 # HOSTING + AUTHENTICATION
 ADMINS = (
@@ -42,7 +40,7 @@ DEFAULT_FROM_EMAIL = 'pulsenoreply@gmail.com'
 DEFAULT_HR_EMAIL = DEFAULT_FROM_EMAIL
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL
-EMAIL_HOST_PASSWORD = 'lukefranktj'
+EMAIL_HOST_PASSWORD = 'lukefranktjPULSE2017!'
 EMAIL_PORT = 587
 
 
