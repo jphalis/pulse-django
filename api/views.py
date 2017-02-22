@@ -404,11 +404,13 @@ class PartyCreateAPIView(ModelViewSet):
                     target=party,
                 )
         party.attendees.add(user)
-        feed_item.send(
-            user,
-            verb='hosting an event.',
-            target=party,
-        )
+
+        if party.invite_type != Party.INVITE_ONLY:
+            feed_item.send(
+                user,
+                verb='hosting an event.',
+                target=party,
+            )
 
 
 class PartyDetailAPIView(CacheMixin,
