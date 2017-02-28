@@ -74,6 +74,7 @@ INSTALLED_APPS = (
     'flag',
     'notifications',
     'parties',
+    'push_notifications',
 )
 
 

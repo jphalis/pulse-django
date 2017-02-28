@@ -127,6 +127,14 @@ TEMPLATES = [
 # CACHE_MIDDLEWARE_SECONDS = 12
 # CACHE_MIDDLEWARE_KEY_PREFIX = ''
 
+# P U S H  N O T I F I C A T I O N S
+PUSH_NOTIFICATIONS_SETTINGS = {
+    "APNS_CERTIFICATE": os.path.join(os.path.dirname(BASE_DIR),
+                                     'push_notifications',
+                                     'certificates',
+                                     'apns_prod.pem')
+}
+
 
 # S T A T I C F I L E S
 USING_S3 = True

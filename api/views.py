@@ -1,4 +1,5 @@
 from datetime import datetime
+from itertools import chain
 
 from rest_framework import generics, mixins, permissions, status
 from rest_framework.decorators import api_view
@@ -22,6 +23,7 @@ from flag.models import Flag
 from notifications.models import Notification
 from notifications.signals import notify
 from parties.models import Party
+from push_notifications.models import APNSDevice
 from .account_serializers import (AccountCreateSerializer, FollowerSerializer,
                                   MyUserSerializer, PhotoCreateSerializer,
                                   PhotoSerializer)
@@ -47,6 +49,7 @@ class APIHomeView(AdminRequiredMixin, CacheMixin, DefaultsMixin, APIView):
         user = request.user
         data = {
             'authentication': {
+                'apns': api_reverse('create_apns_device', request=request),
                 'login': api_reverse('auth_login_api',
                                      request=request),
                 'password_reset': api_reverse('rest_password_reset',
@@ -178,6 +181,16 @@ def follow_status_api(request, user_pk):
             verb='is now following you.',
             # target=viewing_user,
         )
+
+        # Push notifications
+        try:
+            device = APNSDevice.objects.get(user=user)
+        except APNSDevice.DoesNotExist:
+            device = None
+
+        if device:
+            device.send_message(
+                "{} is now following you.".format(viewing_user))
 
         if user in viewing_user.blocking.all():
             viewing_user.blocking.remove(user)
@@ -403,6 +416,17 @@ class PartyCreateAPIView(ModelViewSet):
                     verb='has invited you to their event.',
                     target=party,
                 )
+
+                # Push notifications
+                try:
+                    device = APNSDevice.objects.get(user=invited)
+                except APNSDevice.DoesNotExist:
+                    device = None
+
+                if device:
+                    device.send_message(
+                        "{} has invited you to their event.".format(user))
+
         party.attendees.add(user)
 
         if party.invite_type != Party.INVITE_ONLY:
@@ -502,10 +526,20 @@ def party_attend_api(request, party_pk):
             party.requesters.add(user)
             notify.send(
                 user,
-                recipient=party.user,
+                recipient=party_creator,
                 verb='has requested to attend your event.',
                 target=party,
             )
+
+            # Push notifications
+            try:
+                device = APNSDevice.objects.get(user=party_creator)
+            except APNSDevice.DoesNotExist:
+                device = None
+
+            if device:
+                device.send_message(
+                    "{} has requested to attend your event.".format(user))
     elif party.invite_type == Party.OPEN:
         party.attendees.add(user)
         if user != party_creator:
@@ -515,6 +549,17 @@ def party_attend_api(request, party_pk):
                 verb='will be attending your event.',
                 target=party,
             )
+
+            # Push notifications
+            try:
+                device = APNSDevice.objects.get(user=party_creator)
+            except APNSDevice.DoesNotExist:
+                device = None
+
+            if device:
+                device.send_message(
+                    "{} will be attending your event.".format(user))
+
             feed_item.send(
                 user,
                 verb='attending {0}\'s event.'.format(
@@ -530,6 +575,17 @@ def party_attend_api(request, party_pk):
                 verb='will be attending your event.',
                 target=party,
             )
+
+            # Push notifications
+            try:
+                device = APNSDevice.objects.get(user=party_creator)
+            except APNSDevice.DoesNotExist:
+                device = None
+
+            if device:
+                device.send_message(
+                    "{} will be attending your event.".format(user))
+
             feed_item.send(
                 user,
                 verb='attending {0}\'s event.'.format(
@@ -555,6 +611,17 @@ def requester_approve_api(request, party_pk, user_pk):
         verb='has accepted your request to attend.',
         target=party,
     )
+
+    # Push notifications
+    try:
+        device = APNSDevice.objects.get(user=user)
+    except APNSDevice.DoesNotExist:
+        device = None
+
+    if device:
+        device.send_message(
+            "{} has accepted your request to attend.".format(party_creator))
+
     feed_item.send(
         user,
         verb='attending {0}\'s event.'.format(party_creator.get_full_name),
@@ -598,5 +665,5 @@ class SearchListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     search_fields = ('^full_name',)
 
     def get_queryset(self):
-        return MyUser.objects.filter(is_active=True).only(
-            'id', 'full_name', 'profile_pic')
+        return MyUser.objects.exclude(pk=self.request.user.pk).filter(
+            is_active=True).only('id', 'full_name', 'profile_pic')
