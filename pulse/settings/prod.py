@@ -8,6 +8,7 @@ Glossary of settings/prod.py:
 - Database
 - Templates
 - Cache
+- Push notifications
 - Staticfiles
 - Logging
 """
