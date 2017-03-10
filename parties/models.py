@@ -38,7 +38,8 @@ class PartyManager(models.Manager):
         return super(PartyManager, self).get_queryset() \
             .filter(user=user) \
             .select_related('user') \
-            .prefetch_related('attendees')
+            .prefetch_related('attendees') \
+            .order_by('-is_active', 'start_time')
 
     def own_parties_attending(self, user):
         """

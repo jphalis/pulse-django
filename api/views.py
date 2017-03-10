@@ -1,5 +1,4 @@
 from datetime import datetime
-from itertools import chain
 
 from rest_framework import generics, mixins, permissions, status
 from rest_framework.decorators import api_view
@@ -190,7 +189,8 @@ def follow_status_api(request, user_pk):
 
         if device:
             device.send_message(
-                "{} is now following you.".format(viewing_user))
+                "{} is now following you.".format(viewing_user),
+                sound='default')
 
         if user in viewing_user.blocking.all():
             viewing_user.blocking.remove(user)
@@ -413,7 +413,7 @@ class PartyCreateAPIView(ModelViewSet):
                 notify.send(
                     user,
                     recipient=invited,
-                    verb='has invited you to their event.',
+                    verb='has invited you to an event.',
                     target=party,
                 )
 
@@ -425,7 +425,8 @@ class PartyCreateAPIView(ModelViewSet):
 
                 if device:
                     device.send_message(
-                        "{} has invited you to their event.".format(user))
+                        "{} has invited you to an event.".format(user),
+                        sound='default')
 
         party.attendees.add(user)
 
@@ -539,7 +540,8 @@ def party_attend_api(request, party_pk):
 
             if device:
                 device.send_message(
-                    "{} has requested to attend your event.".format(user))
+                    "{} has requested to attend your event.".format(user),
+                    sound='default')
     elif party.invite_type == Party.OPEN:
         party.attendees.add(user)
         if user != party_creator:
@@ -558,7 +560,8 @@ def party_attend_api(request, party_pk):
 
             if device:
                 device.send_message(
-                    "{} will be attending your event.".format(user))
+                    "{} will be attending your event.".format(user),
+                    sound='default')
 
             feed_item.send(
                 user,
@@ -584,7 +587,8 @@ def party_attend_api(request, party_pk):
 
             if device:
                 device.send_message(
-                    "{} will be attending your event.".format(user))
+                    "{} will be attending your event.".format(user),
+                    sound='default')
 
             feed_item.send(
                 user,
@@ -620,7 +624,8 @@ def requester_approve_api(request, party_pk, user_pk):
 
     if device:
         device.send_message(
-            "{} has accepted your request to attend.".format(party_creator))
+            "{} has accepted your request to attend.".format(party_creator),
+            sound='default')
 
     feed_item.send(
         user,
