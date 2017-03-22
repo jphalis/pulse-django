@@ -88,7 +88,7 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_event_images(self, obj):
         return Party.objects.own_parties_hosting(user=obj).values(
-            'id', 'image',)
+            'id', 'image')
 
     def get_photos(self, obj):
         queryset = Photo.objects.filter(user=obj)

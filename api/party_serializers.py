@@ -17,11 +17,11 @@ class PartySerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Party
-        fields = ('id', 'party_url', 'user_url', 'user', 'user_profile_pic',
-                  'party_type', 'invite_type', 'name', 'location',
-                  'latitude', 'longitude', 'party_size', 'party_month',
-                  'party_day', 'party_year', 'start_time', 'end_time',
-                  'description', 'image', 'attendees_count',
+        fields = ('id', 'is_active', 'party_url', 'user_url', 'user',
+                  'user_profile_pic', 'party_type', 'invite_type', 'name',
+                  'location', 'latitude', 'longitude', 'party_size',
+                  'party_month', 'party_day', 'party_year', 'start_time',
+                  'end_time', 'description', 'image', 'attendees_count',
                   'requesters_count', 'get_attendees_info',
                   'get_requesters_info', 'get_invited_users_info',
                   'get_likers_info',)

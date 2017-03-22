@@ -48,9 +48,6 @@ urlpatterns = [
     url(r'^terms/$',
         views.terms_of_use,
         name='terms_of_use'),
-
-    # Data generator
-    # url(r'^generate/', views.generate_rand_data, name='generate_rand_data')
 ]
 
 if settings.DEBUG:
