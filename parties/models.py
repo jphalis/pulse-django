@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from datetime import date
+from datetime import date, datetime
 
 from django.conf import settings
 from django.core.validators import MaxValueValidator
@@ -39,7 +39,8 @@ class PartyManager(models.Manager):
             .filter(user=user) \
             .select_related('user') \
             .prefetch_related('attendees') \
-            .order_by('-is_active', '-start_time')
+            .order_by('-is_active', 'party_year', 'party_month', 'party_day',
+                      'start_time')
 
     def own_parties_attending(self, user):
         """

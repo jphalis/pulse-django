@@ -476,10 +476,13 @@ class PartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
     search_fields = ('user__email', 'user__full_name',
                      'attendees__email', 'attendees__full_name',
                      'requesters__email', 'requesters__full_name',)
-    ordering_fields = ('created',)
+    ordering_fields = ('party_year', 'party_month', 'party_day',
+                       'start_time',)
 
     def get_queryset(self):
-        return Party.objects.active().exclude(invite_type=Party.INVITE_ONLY)
+        return Party.objects.active() \
+            .exclude(invite_type=Party.INVITE_ONLY) \
+            .order_by('party_year', 'party_month', 'party_day', 'start_time')
 
 
 class OwnPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
