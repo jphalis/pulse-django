@@ -457,7 +457,7 @@ class PartyDetailAPIView(CacheMixin,
         else:
             expires_on = datetime(
                 obj.party_year, obj.party_month, obj.party_day)
-            obj.is_active = True if datetime.today() > expires_on else False
+            obj.is_active = False if datetime.today() > expires_on else True
         obj.save(update_fields=['is_active'])
         return obj
 
