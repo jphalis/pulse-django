@@ -133,7 +133,8 @@ PUSH_NOTIFICATIONS_SETTINGS = {
     "APNS_CERTIFICATE": os.path.join(os.path.dirname(BASE_DIR),
                                      'push_notifications',
                                      'certificates',
-                                     'apns_prod.pem')
+                                     'apns_prod.pem'),
+    "UPDATE_ON_DUPLICATE_REG_ID": True
 }
 
 
