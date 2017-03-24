@@ -82,13 +82,12 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_event_count(self, obj):
         count = Party.objects.own_parties_hosting(user=obj).count()
-        if count == 0:
-            return '0'
-        return str(count)
+        return '0' if count == 0 else str(count)
 
     def get_event_images(self, obj):
         return Party.objects.own_parties_hosting(user=obj).values(
-            'id', 'image')
+            'id', 'image', 'start_time', 'is_active', 'party_day',
+            'party_month', 'party_year',)
 
     def get_photos(self, obj):
         queryset = Photo.objects.filter(user=obj)
