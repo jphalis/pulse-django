@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from rest_framework import generics, mixins, permissions, status
 from rest_framework.decorators import api_view
@@ -455,9 +455,9 @@ class PartyDetailAPIView(CacheMixin,
                 int(obj.end_time.strftime('%M')))
             obj.is_active = False if expires_on <= datetime.now() else True
         else:
-            expires_on = datetime(
+            expires_on = date(
                 obj.party_year, obj.party_month, obj.party_day)
-            obj.is_active = False if datetime.today() > expires_on else True
+            obj.is_active = False if datetime.now().date() > expires_on else True
         obj.save(update_fields=['is_active'])
         return obj
 
