@@ -22,34 +22,15 @@ class FeedManager(models.Manager):
         except Follower.DoesNotExist:
             follow = None
 
-        own_feed = self.own_for_user(user=user)
+        # own_feed = self.own_for_user(user=user)
+        own_feed = self.filter(sender_object_id=user.id)
 
-        if follow:
-            if follow.following.count() == 0:
-                return own_feed
-            following_feed = self.following_for_user(user=user)
+        if follow and follow.following.count() > 0:
+            # following_feed = self.following_for_user(user=user)
+            following_feed = self.filter(
+                sender_object_id__in=user.follower.following.values('user_id'))
             return (own_feed | following_feed).distinct()
         return own_feed
-
-    def following_for_user(self, user):
-        """
-        Returns all of the feed items for the users the user is following.
-        """
-        return super(FeedManager, self).get_queryset().filter(
-            sender_object_id__in=user.follower.following.values('user_id'))
-
-    def own_for_user(self, user):
-        """
-        Returns all of the feed items the user has created.
-        """
-        return super(FeedManager, self).get_queryset().filter(
-            sender_object_id=user.id)
-
-    def recent_for_user(self, user, num):
-        """
-        Returns N (num) recent feed items for the user.
-        """
-        return self.all_for_user(user=user)[:num]
 
 
 @python_2_unicode_compatible

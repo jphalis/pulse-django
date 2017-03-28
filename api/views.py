@@ -304,12 +304,11 @@ class PasswordChangeView(generics.GenericAPIView):
 ########################################################################
 # FEED                                                                 #
 ########################################################################
-class FeedAPIView(CacheMixin, DefaultsMixin, generics.ListAPIView):
-    # cache_timeout = 60 * 7
+class FeedAPIView(DefaultsMixin, generics.ListAPIView):
     serializer_class = FeedSerializer
 
     def get_queryset(self):
-        return Feed.objects.recent_for_user(user=self.request.user, num=50)
+        return Feed.objects.all_for_user(user=self.request.user)[:50]
 
 
 ########################################################################
@@ -448,16 +447,17 @@ class PartyDetailAPIView(CacheMixin,
 
     def get_object(self):
         obj = get_object_or_404(Party, pk=self.kwargs["party_pk"])
+        now = datetime.now()
         if obj.end_time:
             expires_on = datetime(
                 obj.party_year, obj.party_month, obj.party_day,
                 int(obj.end_time.strftime('%H')),
                 int(obj.end_time.strftime('%M')))
-            obj.is_active = False if expires_on <= datetime.now() else True
+            obj.is_active = False if expires_on <= now else True
         else:
             expires_on = date(
                 obj.party_year, obj.party_month, obj.party_day)
-            obj.is_active = False if datetime.now().date() > expires_on else True
+            obj.is_active = False if now.date() > expires_on else True
         obj.save(update_fields=['is_active'])
         return obj
 
@@ -478,6 +478,7 @@ class PartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
                      'requesters__email', 'requesters__full_name',)
     ordering_fields = ('party_year', 'party_month', 'party_day',
                        'start_time',)
+    queryset = None
 
     def get_queryset(self):
         return Party.objects.active() \
