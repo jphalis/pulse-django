@@ -40,7 +40,7 @@ class PartyManager(models.Manager):
             .select_related('user') \
             .prefetch_related('attendees') \
             .order_by('-is_active', 'party_year', 'party_month', 'party_day',
-                      'start_time')
+                      '-start_time')
 
     def own_parties_attending(self, user):
         """

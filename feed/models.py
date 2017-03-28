@@ -22,11 +22,9 @@ class FeedManager(models.Manager):
         except Follower.DoesNotExist:
             follow = None
 
-        # own_feed = self.own_for_user(user=user)
         own_feed = self.filter(sender_object_id=user.id)
 
         if follow and follow.following.count() > 0:
-            # following_feed = self.following_for_user(user=user)
             following_feed = self.filter(
                 sender_object_id__in=user.follower.following.values('user_id'))
             return (own_feed | following_feed).distinct()
