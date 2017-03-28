@@ -18,7 +18,7 @@ class FeedManager(models.Manager):
         Returns all of the feed items for the user.
         """
         try:
-            follow = Follower.objects.select_related('user').get(user=user)
+            follow = Follower.objects.get(user=user)
         except Follower.DoesNotExist:
             follow = None
 
