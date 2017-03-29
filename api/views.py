@@ -41,9 +41,7 @@ from .search_serializers import SearchMyUserSerializer
 # Create your views here.
 
 
-class APIHomeView(AdminRequiredMixin, CacheMixin, DefaultsMixin, APIView):
-    cache_timeout = 60 * 60 * 24 * 30
-
+class APIHomeView(AdminRequiredMixin, DefaultsMixin, APIView):
     def get(self, request, format=None):
         user = request.user
         data = {
