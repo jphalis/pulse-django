@@ -473,7 +473,6 @@ class PartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
                      'requesters__email', 'requesters__full_name',)
     ordering_fields = ('party_year', 'party_month', 'party_day',
                        'start_time',)
-    queryset = None
 
     def get_queryset(self):
         return Party.objects.active() \

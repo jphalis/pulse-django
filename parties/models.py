@@ -27,9 +27,7 @@ class PartyManager(models.Manager):
         Returns all active parties.
         """
         return super(PartyManager, self).get_queryset() \
-            .filter(is_active=True) \
-            .select_related('user') \
-            .prefetch_related('attendees')
+            .filter(is_active=True)
 
     def own_parties_hosting(self, user):
         """
@@ -37,8 +35,6 @@ class PartyManager(models.Manager):
         """
         return super(PartyManager, self).get_queryset() \
             .filter(user=user) \
-            .select_related('user') \
-            .prefetch_related('attendees') \
             .order_by('-is_active', 'party_year', 'party_month', 'party_day',
                       '-start_time')
 
@@ -47,9 +43,7 @@ class PartyManager(models.Manager):
         Returns all of the parties the user is attending.
         """
         return super(PartyManager, self).get_queryset() \
-            .filter(attendees=user) \
-            .select_related('user') \
-            .prefetch_related('attendees')
+            .filter(attendees=user)
 
     def party_create(self, user, party_type, name, location, party_size,
                      party_month, party_day, start_time, end_time=None,
