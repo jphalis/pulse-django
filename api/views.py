@@ -473,11 +473,9 @@ class PartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
                      'requesters__email', 'requesters__full_name',)
     ordering_fields = ('party_year', 'party_month', 'party_day',
                        'start_time',)
-
-    def get_queryset(self):
-        return Party.objects.active() \
-            .exclude(invite_type=Party.INVITE_ONLY) \
-            .order_by('party_year', 'party_month', 'party_day', 'start_time')
+    queryset = Party.objects.active().exclude(
+        invite_type=Party.INVITE_ONLY).order_by(
+            'party_year', 'party_month', 'party_day', 'start_time')
 
 
 class OwnPartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
