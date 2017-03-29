@@ -112,8 +112,7 @@ class MyUserListAPIView(CacheMixin, DefaultsMixin, generics.ListAPIView):
     queryset = MyUser.objects.all()
 
 
-class MyUserDetailAPIView(CacheMixin,
-                          generics.RetrieveAPIView,
+class MyUserDetailAPIView(generics.RetrieveAPIView,
                           mixins.DestroyModelMixin,
                           mixins.UpdateModelMixin):
     cache_timeout = 60 * 5
@@ -437,11 +436,9 @@ class PartyCreateAPIView(ModelViewSet):
             )
 
 
-class PartyDetailAPIView(CacheMixin,
-                         generics.RetrieveAPIView,
+class PartyDetailAPIView(generics.RetrieveAPIView,
                          mixins.DestroyModelMixin,
                          mixins.UpdateModelMixin):
-    cache_timeout = 60 * 7
     permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly,)
     serializer_class = PartySerializer
 
@@ -468,9 +465,7 @@ class PartyDetailAPIView(CacheMixin,
         return self.update(request, *args, **kwargs)
 
 
-class PartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
-                       generics.ListAPIView):
-    # cache_timeout = 60 * 60 * 24
+class PartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
     pagination_class = PartyPagination
     serializer_class = PartySerializer
     search_fields = ('user__email', 'user__full_name',
@@ -486,9 +481,7 @@ class PartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
             .order_by('party_year', 'party_month', 'party_day', 'start_time')
 
 
-class OwnPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
-                          generics.ListAPIView):
-    # cache_timeout = 60 * 60 * 24
+class OwnPartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
     pagination_class = PartyPagination
     serializer_class = PartySerializer
     search_fields = ('user__email', 'user__full_name',
@@ -500,9 +493,7 @@ class OwnPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
         return Party.objects.own_parties_hosting(user=self.request.user)
 
 
-class UserPartyListAPIView(CacheMixin, DefaultsMixin, FiltersMixin,
-                           generics.ListAPIView):
-    # cache_timeout = 60 * 60 * 24
+class UserPartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
     pagination_class = PartyPagination
     serializer_class = PartySerializer
     search_fields = ('user__email', 'user__full_name',
