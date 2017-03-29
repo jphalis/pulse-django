@@ -68,7 +68,8 @@ class APIHomeView(AdminRequiredMixin, DefaultsMixin, APIView):
             },
             'feed': {
                 'url': api_reverse('feed_list_api',
-                                   request=request),
+                                   request=request,
+                                   kwargs={'user_id': user.id}),
             },
             'notifications': {
                 'count': Notification.objects.unread_for_user(user).count(),
@@ -305,7 +306,8 @@ class FeedAPIView(DefaultsMixin, generics.ListAPIView):
     serializer_class = FeedSerializer
 
     def get_queryset(self):
-        return Feed.objects.all_for_user(user=self.request.user)[:50]
+        user = MyUser.objects.get(id=self.kwargs['user_id'])
+        return Feed.objects.all_for_user(user=user)[:50]
 
 
 ########################################################################

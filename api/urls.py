@@ -64,7 +64,7 @@ urlpatterns = [
         name='rest_password_change'),
 
     # F E E D
-    url(r'^feed/$',
+    url(r'^feed/(?P<user_id>\d+)/$',
         FeedAPIView.as_view(),
         name='feed_list_api'),
 
