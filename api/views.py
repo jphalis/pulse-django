@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.db.models import F
 from django.shortcuts import get_object_or_404
+from django.views.decorators.cache import never_cache
 
 from accounts.models import Follower, MyUser, Photo
 from core.mixins import AdminRequiredMixin, CacheMixin
@@ -471,11 +472,13 @@ class PartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
     search_fields = ('user__email', 'user__full_name',
                      'attendees__email', 'attendees__full_name',
                      'requesters__email', 'requesters__full_name',)
-    ordering_fields = ('party_year', 'party_month', 'party_day',
-                       'start_time',)
     queryset = Party.objects.active().exclude(
         invite_type=Party.INVITE_ONLY).order_by(
             'party_year', 'party_month', 'party_day', 'start_time')
+
+    @never_cache
+    def dispatch(self, *args, **kwargs):
+        return super(PartyListAPIView, self).dispatch(*args, **kwargs)
 
 
 class OwnPartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
