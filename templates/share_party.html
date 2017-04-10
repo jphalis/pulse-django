@@ -5,6 +5,7 @@
 {% endblock content %}
 
 {% block jquery %}
+    <script src='//mobileesp.googlecode.com/svn/JavaScript/mdetect.js'></script>
     <script type="text/javascript">
         $(document).ready(function() {
             var user_agent_header = navigator.userAgent;
@@ -13,7 +14,8 @@
                 var result = url.replace(/(^\w+:|^)\/\//, '');
                 setTimeout(function() {
                     window.location = "PulseSocialAppUrlScheme://" + result;
-                }, 21);
+                }, 300);
+                window.location.href = 'https://itunes.apple.com/us/app/pulse-social-app/id1194288589?mt=8';
             }
             else {
                 $('h1').text('Must be on an iPhone or iPod to view.')
