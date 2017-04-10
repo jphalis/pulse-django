@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
+
+from parties.models import Party
 
 # Create views here.
 
@@ -13,3 +15,8 @@ def privacy_policy(request):
 
 def terms_of_use(request):
     return render(request, 'terms_of_use.html', {})
+
+
+def share_party(request, party_pk):
+    party = get_object_or_404(Party, pk=party_pk)
+    return render(request, 'share_party.html', {'party': party})

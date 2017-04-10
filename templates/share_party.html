@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="text-center"></h1>
+{% endblock content %}
+
+{% block jquery %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var user_agent_header = navigator.userAgent;
+            if(user_agent_header.indexOf('iPhone')!=-1 || user_agent_header.indexOf('iPod')!=-1){
+                var url = window.location.href;
+                var result = url.replace(/(^\w+:|^)\/\//, '');
+                setTimeout(function() {
+                    window.location = "PulseSocialAppUrlScheme://" + result;
+                }, 21);
+            }
+            else {
+                $('h1').text('Must be on an iPhone or iPod to view.')
+            }
+        });
+    </script>
+{% endblock jquery %}

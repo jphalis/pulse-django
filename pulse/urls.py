@@ -48,6 +48,11 @@ urlpatterns = [
     url(r'^terms/$',
         views.terms_of_use,
         name='terms_of_use'),
+
+    # Share
+    url(r'^party/share/(?P<party_pk>\d+)/$',
+        views.share_party,
+        name='share_party'),
 ]
 
 if settings.DEBUG:
