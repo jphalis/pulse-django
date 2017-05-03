@@ -39,21 +39,11 @@
                 //     alert('aaa');
                 //     document.body.appendChild(iframe);
                 // }
-                try {
-                    window.location = "PulseSocialAppUrlScheme://" + result;
-                }
-                catch(err) {
-                    // console.log("Input is " + err);
-                }
-                finally {
-                    setTimeout(function(){
-                    window.location = 'itms-apps://itunes.apple.com/us/app/pulse-social-app/id1194288589?mt=8'; //fallback url
-                }, 500);
-                }
 
-                // setTimeout(function(){
-                //     window.location = 'itms-apps://itunes.apple.com/us/app/pulse-social-app/id1194288589?mt=8'; //fallback url
-                // }, 500);
+                setTimeout(function(){
+                    window.location = 'itms-apps://itunes.apple.com/us/app/pulse-social-app/id1194288589?mt=8'; //fallback url
+                }, 25);
+                window.location = "PulseSocialAppUrlScheme://" + result;
             } else {
                 $('h1').text('Must be on an iPhone or iPod to view.')
             }
