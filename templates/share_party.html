@@ -31,7 +31,7 @@
                 iframe.style.width = "1px";
                 iframe.style.height = "1px";
                 iframe.onload = function () {
-                    document.location = "PulseSocialAppUrlScheme://" + result;;
+                    window.location = "PulseSocialAppUrlScheme://" + result;;
                 };
                 iframe.src = "PulseSocialAppUrlScheme://" + result;; //iOS app schema url
 
