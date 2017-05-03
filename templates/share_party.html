@@ -26,22 +26,24 @@
             if(user_agent_header.indexOf('iPhone')!=-1 || user_agent_header.indexOf('iPod')!=-1){
                 var url = window.location.href;
                 var result = url.replace(/(^\w+:|^)\/\//, '');
-                var iframe = document.createElement("iframe");
-                iframe.style.border = "none";
-                iframe.style.width = "1px";
-                iframe.style.height = "1px";
-                iframe.onload = function () {
-                    window.location = "PulseSocialAppUrlScheme://" + result;;
-                };
-                iframe.src = "PulseSocialAppUrlScheme://" + result;; //iOS app schema url
-
-                window.onload = function(){
-                    document.body.appendChild(iframe);
-                }
+                // var iframe = document.createElement("iframe");
+                // iframe.style.border = "none";
+                // iframe.style.width = "1px";
+                // iframe.style.height = "1px";
+                // iframe.onload = function () {
+                //     alert('here');
+                //     document.location = "PulseSocialAppUrlScheme://" + result;
+                // };
+                // iframe.src = "PulseSocialAppUrlScheme://" + result; //iOS app schema url
+                // window.onload = function(){
+                //     alert('aaa');
+                //     document.body.appendChild(iframe);
+                // }
+                window.location = "PulseSocialAppUrlScheme://" + result;
 
                 setTimeout(function(){
                     window.location = 'itms-apps://itunes.apple.com/us/app/pulse-social-app/id1194288589?mt=8'; //fallback url
-                }, 300);
+                }, 500);
             } else {
                 $('h1').text('Must be on an iPhone or iPod to view.')
             }
