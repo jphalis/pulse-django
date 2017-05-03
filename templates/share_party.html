@@ -6,19 +6,32 @@
 
 {% block jquery %}
     <script type="text/javascript">
-        $(document).ready(function() {
+        // $(document).ready(function() {
+        //     var user_agent_header = navigator.userAgent;
+        //     if(user_agent_header.indexOf('iPhone')!=-1 || user_agent_header.indexOf('iPod')!=-1){
+        //         var url = window.location.href;
+        //         var result = url.replace(/(^\w+:|^)\/\//, '');
+        //         window.location = "PulseSocialAppUrlScheme://" + result;
+        //         setTimeout(function() {
+        //             window.location.href = 'itms-apps://itunes.apple.com/us/app/pulse-social-app/id1194288589?mt=8';
+        //         }, 300);
+        //     }
+        //     else {
+        //         $('h1').text('Must be on an iPhone or iPod to view.')
+        //     }
+        // });
+
+        window.onload = function() {
             var user_agent_header = navigator.userAgent;
             if(user_agent_header.indexOf('iPhone')!=-1 || user_agent_header.indexOf('iPod')!=-1){
                 var url = window.location.href;
                 var result = url.replace(/(^\w+:|^)\/\//, '');
                 window.location = "PulseSocialAppUrlScheme://" + result;
-                setTimeout(function() {
-                    window.location.href = 'itms-apps://itunes.apple.com/us/app/pulse-social-app/id1194288589?mt=8';
-                }, 300);
+                setTimeout("window.location = 'itms-apps://itunes.apple.com/us/app/pulse-social-app/id1194288589?mt=8';", 500);
             }
             else {
                 $('h1').text('Must be on an iPhone or iPod to view.')
             }
-        });
+        }
     </script>
 {% endblock jquery %}
