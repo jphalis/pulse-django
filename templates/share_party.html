@@ -1,4 +1,4 @@
-<!-- {% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
     <h1 class="text-center"></h1>
@@ -26,32 +26,25 @@
             if(user_agent_header.indexOf('iPhone')!=-1 || user_agent_header.indexOf('iPod')!=-1){
                 var url = window.location.href;
                 var result = url.replace(/(^\w+:|^)\/\//, '');
-                window.location = "PulseSocialAppUrlScheme://" + result;
-                setTimeout("window.location = 'itms-apps://itunes.apple.com/us/app/pulse-social-app/id1194288589?mt=8';", 500);
-            }
-            else {
+                var iframe = document.createElement("iframe");
+                iframe.style.border = "none";
+                iframe.style.width = "1px";
+                iframe.style.height = "1px";
+                iframe.onload = function () {
+                    document.location = "PulseSocialAppUrlScheme://" + result;;
+                };
+                iframe.src = "PulseSocialAppUrlScheme://" + result;; //iOS app schema url
+
+                window.onload = function(){
+                    document.body.appendChild(iframe);
+                }
+
+                setTimeout(function(){
+                    window.location = 'itms-apps://itunes.apple.com/us/app/pulse-social-app/id1194288589?mt=8'; //fallback url
+                }, 300);
+            } else {
                 $('h1').text('Must be on an iPhone or iPod to view.')
             }
         }
     </script>
-{% endblock jquery %} -->
-
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta http-equiv="refresh" content="1; url=itms-apps://itunes.apple.com/us/app/pulse-social-app/id1194288589?mt=8">
-    <script>
-        function tryOpenApp() {
-            var url = window.location.href;
-            var result = url.replace(/(^\w+:|^)\/\//, '');
-            var iframe = document.createElement("iframe");
-            iframe.style.border = "none";
-            iframe.style.width = "1px";
-            iframe.style.height = "1px";
-            iframe.src = "PulseSocialAppUrlScheme://" + result;
-            document.body.appendChild(iframe);
-        }
-    </script>
-  </head>
-  <body onload="tryOpenApp()"></body>
-</html>
+{% endblock jquery %}
