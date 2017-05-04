@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from rest_framework import generics, mixins, permissions, status
 from rest_framework.decorators import api_view
@@ -447,10 +447,20 @@ class PartyDetailAPIView(generics.RetrieveAPIView,
         obj = get_object_or_404(Party, pk=self.kwargs["party_pk"])
         now = datetime.now()
         if obj.end_time:
-            expires_on = datetime(
-                obj.party_year, obj.party_month, obj.party_day,
-                int(obj.end_time.strftime('%H')),
-                int(obj.end_time.strftime('%M')))
+            if obj.end_time < obj.start_time:
+                expires_on = datetime(
+                    obj.party_year,
+                    obj.party_month,
+                    obj.party_day,
+                    int(obj.end_time.strftime('%H')),
+                    int(obj.end_time.strftime('%M'))
+                )
+                expires_on += timedelta(days=1)
+            else:
+                expires_on = datetime(
+                    obj.party_year, obj.party_month, obj.party_day,
+                    int(obj.end_time.strftime('%H')),
+                    int(obj.end_time.strftime('%M')))
             obj.is_active = False if expires_on <= now else True
         else:
             expires_on = date(
