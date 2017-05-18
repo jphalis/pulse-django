@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from flag.models import Flag
 
 
+@admin.register(Flag)
 class FlagAdmin(admin.ModelAdmin):
     list_display = ('id', 'creator', 'link_to_party', 'resolved', 'flag_count')
     list_filter = ('flag_count', 'resolved',)
@@ -18,7 +19,5 @@ class FlagAdmin(admin.ModelAdmin):
 
     def link_to_party(self, obj):
         link = reverse("admin:parties_party_change", args=[obj.party.id])
-        return u'<a href="%s">%s</a>' % (link, obj.party.pk)
+        return u'<a href="{}">{}</a>'.format(link, obj.party.pk)
     link_to_party.allow_tags = True
-
-admin.site.register(Flag, FlagAdmin)

@@ -6,6 +6,7 @@ from .models import Party
 # Register your models here.
 
 
+@admin.register(Party)
 class PartyAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'user', 'is_active',)
     list_display_links = ('id', 'name',)
@@ -44,6 +45,3 @@ class PartyAdmin(admin.ModelAdmin):
 
     class Meta:
         model = Party
-
-
-admin.site.register(Party, PartyAdmin)

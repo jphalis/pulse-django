@@ -5,6 +5,7 @@ from .models import Notification
 # Register your models here.
 
 
+@admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ['id', 'recipient', '__str__', 'read']
     list_display_links = ('id', 'recipient',)
@@ -13,6 +14,3 @@ class NotificationAdmin(admin.ModelAdmin):
 
     class Meta:
         model = Notification
-
-
-admin.site.register(Notification, NotificationAdmin)

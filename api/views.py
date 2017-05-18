@@ -145,7 +145,7 @@ class PhotoCreateAPIView(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user,
-                        photo=self.request.data.get('photo'))
+                        photo=self.request.data['photo'])
 
 
 @api_view(['DELETE'])
@@ -177,7 +177,6 @@ def follow_status_api(request, user_pk):
             viewing_user,
             recipient=user,
             verb='is now following you.',
-            # target=viewing_user,
         )
 
         # Push notifications
@@ -189,7 +188,8 @@ def follow_status_api(request, user_pk):
         if device:
             device.send_message(
                 "{} is now following you.".format(viewing_user),
-                sound='default')
+                sound='default'
+            )
 
         if user in viewing_user.blocking.all():
             viewing_user.blocking.remove(user)
@@ -264,7 +264,8 @@ class PasswordResetView(generics.GenericAPIView):
         serializer.save()
         return RestResponse(
             {"success": "Password reset e-mail has been sent."},
-            status=status.HTTP_200_OK)
+            status=status.HTTP_200_OK
+        )
 
 
 class PasswordResetConfirmView(generics.GenericAPIView):
@@ -327,10 +328,13 @@ def flag_create_api(request, party_pk):
     party_creator.times_flagged = F('times_flagged') + 1
     party_creator.save(update_fields=['times_flagged'])
 
-    send_mail('FLAGGED ITEM',
-              'There is a new flagged item with the id: {}'.format(flagged.id),
-              settings.DEFAULT_HR_EMAIL, [settings.DEFAULT_HR_EMAIL],
-              fail_silently=True)
+    send_mail(
+        'FLAGGED ITEM',
+        'There is a new flagged item with the id: {}'.format(flagged.id),
+        settings.DEFAULT_HR_EMAIL,
+        [settings.DEFAULT_HR_EMAIL],
+        fail_silently=True
+    )
 
     serializer = PartySerializer(party, context={'request': request})
     return RestResponse(serializer.data, status=status.HTTP_201_CREATED)
@@ -387,23 +391,25 @@ class PartyCreateAPIView(ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
-        serializer.save(user=user,
-                        party_type=self.request.data.get('party_type'),
-                        invite_type=self.request.data.get('invite_type'),
-                        name=self.request.data.get('name'),
-                        location=self.request.data.get('location'),
-                        latitude=self.request.data.get('latitude'),
-                        longitude=self.request.data.get('longitude'),
-                        party_size=self.request.data.get('party_size'),
-                        party_month=self.request.data.get('party_month'),
-                        party_day=self.request.data.get('party_day'),
-                        party_year=self.request.data.get('party_year'),
-                        start_time=self.request.data.get('start_time'),
-                        end_time=self.request.data.get('end_time'),
-                        description=self.request.data.get('description'),
-                        image=self.request.data.get('image'),)
-        party = Party.objects.get(id=serializer.data.get('id'))
-        user_ids = self.request.data.get('invited_user_ids')
+        serializer.save(
+            user=user,
+            party_type=self.request.data['party_type'],
+            invite_type=self.request.data['invite_type'],
+            name=self.request.data['name'],
+            location=self.request.data['location'],
+            latitude=self.request.data['latitude'],
+            longitude=self.request.data['longitude'],
+            party_size=self.request.data['party_size'],
+            party_month=self.request.data['party_month'],
+            party_day=self.request.data['party_day'],
+            party_year=self.request.data['party_year'],
+            start_time=self.request.data['start_time'],
+            end_time=self.request.data['end_time'],
+            description=self.request.data['description'],
+            image=self.request.data['image'],
+        )
+        party = Party.objects.get(id=serializer.data['id'])
+        user_ids = self.request.data['invited_user_ids']
 
         if user_ids:
             for user_id in user_ids.split(','):
@@ -425,7 +431,8 @@ class PartyCreateAPIView(ModelViewSet):
                 if device:
                     device.send_message(
                         "{} has invited you to an event.".format(user),
-                        sound='default')
+                        sound='default'
+                    )
 
         party.attendees.add(user)
 
@@ -523,7 +530,6 @@ def party_attend_api(request, party_pk):
     party_creator = party.user
 
     if user in party.attendees.all():
-        # party.attendees.remove(user)
         pass
     elif party.invite_type == Party.REQUEST_APPROVAL:
         if user == party_creator:
@@ -546,7 +552,8 @@ def party_attend_api(request, party_pk):
             if device:
                 device.send_message(
                     "{} has requested to attend your event.".format(user),
-                    sound='default')
+                    sound='default'
+                )
     elif party.invite_type == Party.OPEN:
         party.attendees.add(user)
         if user != party_creator:
@@ -566,11 +573,12 @@ def party_attend_api(request, party_pk):
             if device:
                 device.send_message(
                     "{} will be attending your event.".format(user),
-                    sound='default')
+                    sound='default'
+                )
 
             feed_item.send(
                 user,
-                verb='attending {0}\'s event.'.format(
+                verb='attending {}\'s event.'.format(
                     party_creator.get_full_name),
                 target=party,
             )
@@ -593,11 +601,12 @@ def party_attend_api(request, party_pk):
             if device:
                 device.send_message(
                     "{} will be attending your event.".format(user),
-                    sound='default')
+                    sound='default'
+                )
 
             feed_item.send(
                 user,
-                verb='attending {0}\'s event.'.format(
+                verb='attending {}\'s event.'.format(
                     party_creator.get_full_name),
                 target=party,
             )
@@ -630,11 +639,12 @@ def requester_approve_api(request, party_pk, user_pk):
     if device:
         device.send_message(
             "{} has accepted your request to attend.".format(party_creator),
-            sound='default')
+            sound='default'
+        )
 
     feed_item.send(
         user,
-        verb='attending {0}\'s event.'.format(party_creator.get_full_name),
+        verb='attending {}\'s event.'.format(party_creator.get_full_name),
         target=party,
     )
     serializer = PartySerializer(party, context={'request': request})

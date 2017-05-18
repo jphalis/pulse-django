@@ -9,6 +9,10 @@ from .models import MyUser, Photo
 # Register your models here.
 
 
+admin.site.unregister(Group)
+
+
+@admin.register(MyUser)
 class MyUserAdmin(UserAdmin):
     form = MyUserChangeForm
     add_form = MyUserCreationForm
@@ -59,6 +63,7 @@ class MyUserAdmin(UserAdmin):
     disable.short_description = _("Disable selected users")
 
 
+@admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
     list_display = ['id', '__str__']
     list_display_links = ('id', '__str__',)
@@ -66,8 +71,3 @@ class PhotoAdmin(admin.ModelAdmin):
 
     class Meta:
         model = Photo
-
-
-admin.site.unregister(Group)
-admin.site.register(MyUser, MyUserAdmin)
-admin.site.register(Photo, PhotoAdmin)

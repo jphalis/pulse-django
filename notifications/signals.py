@@ -5,7 +5,8 @@ from .models import Notification
 
 
 notify = Signal(
-    providing_args=['recipient', 'verb', 'action', 'target', 'affected_users'])
+    providing_args=['recipient', 'verb', 'action', 'target', 'affected_users']
+)
 
 
 def new_notification(sender, **kwargs):
@@ -31,7 +32,7 @@ def new_notification(sender, **kwargs):
                                     ContentType.objects.get_for_model(obj))
                             setattr(new_note, "{}_object_id".format(option),
                                     obj.id)
-                    except:
+                    except StandardError:
                         pass
                 new_note.save()
         else:
@@ -44,9 +45,9 @@ def new_notification(sender, **kwargs):
             for option in ("target", "action"):
                 obj = kwargs.pop(option, None)
                 if obj is not None:
-                    setattr(new_note, "{0}_content_type".format(option),
+                    setattr(new_note, "{}_content_type".format(option),
                             ContentType.objects.get_for_model(obj))
-                    setattr(new_note, "{0}_object_id".format(option), obj.id)
+                    setattr(new_note, "{}_object_id".format(option), obj.id)
             new_note.save()
 
 

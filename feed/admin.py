@@ -5,6 +5,7 @@ from .models import Feed
 # Register your models here.
 
 
+@admin.register(Feed)
 class FeedAdmin(admin.ModelAdmin):
     list_display = ['id', '__str__']
     list_display_links = ('id',)
@@ -12,6 +13,3 @@ class FeedAdmin(admin.ModelAdmin):
 
     class Meta:
         model = Feed
-
-
-admin.site.register(Feed, FeedAdmin)

@@ -24,11 +24,11 @@ def new_feed_item(sender, **kwargs):
                 try:
                     obj = kwargs[option]
                     if obj is not None:
-                        setattr(new_item, "{0}_content_type".format(option),
+                        setattr(new_item, "{}_content_type".format(option),
                                 ContentType.objects.get_for_model(obj))
-                        setattr(new_item, "{0}_object_id".format(option),
+                        setattr(new_item, "{}_object_id".format(option),
                                 obj.id)
-                except:
+                except StandardError:
                     pass
             new_item.save()
     else:
@@ -40,9 +40,9 @@ def new_feed_item(sender, **kwargs):
         for option in ("target", "action"):
             obj = kwargs.pop(option, None)
             if obj is not None:
-                setattr(new_item, "{0}_content_type".format(option),
+                setattr(new_item, "{}_content_type".format(option),
                         ContentType.objects.get_for_model(obj))
-                setattr(new_item, "{0}_object_id".format(option), obj.id)
+                setattr(new_item, "{}_object_id".format(option), obj.id)
         new_item.save()
 
 

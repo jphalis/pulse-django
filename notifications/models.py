@@ -34,7 +34,7 @@ class NotificationManager(models.Manager):
             recipient=user, read=False)
 
     def get_recent_for_user(self, user, num):
-        r"""
+        """
         Returns N (num) recent notifications for the user.
         """
         return super(NotificationManager, self).get_queryset().filter(

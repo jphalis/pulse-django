@@ -68,18 +68,20 @@ class PartyManager(models.Manager):
         elif not start_time:
             raise ValueError('There must be a start time for the party.')
 
-        party = self.model(user=user,
-                           party_type=party_type,
-                           name=name,
-                           location=location,
-                           party_size=party_size,
-                           party_month=party_month,
-                           party_day=party_day,
-                           start_time=start_time,
-                           end_time=end_time,
-                           description=description,
-                           image=image,
-                           **extra_fields)
+        party = self.model(
+            user=user,
+            party_type=party_type,
+            name=name,
+            location=location,
+            party_size=party_size,
+            party_month=party_month,
+            party_day=party_day,
+            start_time=start_time,
+            end_time=end_time,
+            description=description,
+            image=image,
+            **extra_fields
+        )
         party.save(using=self._db)
         party.attendees.add(user)
         return party
@@ -167,7 +169,7 @@ class Party(TimeStampedModel):
         ordering = ['-created']
 
     def __str__(self):
-        return u'{}'.format(self.user.get_full_name)
+        return str(self.user.get_full_name)
 
     @cached_property
     def get_attendees_info(self):

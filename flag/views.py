@@ -30,8 +30,4 @@ def flag_create_ajax(request):
               'There is a new flagged item with the id: {}'.format(flagged.id),
               settings.DEFAULT_HR_EMAIL, [settings.DEFAULT_HR_EMAIL],
               fail_silently=True)
-
-    data = {
-        "party_flagged": True,
-    }
-    return JsonResponse(data)
+    return JsonResponse({"party_flagged": True})

@@ -25,13 +25,16 @@ ADMINS = (
     # ("Frank Szucs", ""),
 )
 MANAGERS = ADMINS
-FULL_DOMAIN = 'pulse-ios.herokuapp.com'
+FULL_DOMAIN = ''
+HEROKU_DOMAIN = 'pulse-ios.herokuapp.com'
 ALLOWED_HOSTS = [
     '127.0.0.1',
-    '*{}'.format(FULL_DOMAIN),
-    '*.{}'.format(FULL_DOMAIN),
-    'wwww.{}'.format(FULL_DOMAIN),
+
+    HEROKU_DOMAIN,
+    '*{}'.format(HEROKU_DOMAIN),
+
     FULL_DOMAIN,
+    '*{}'.format(FULL_DOMAIN),
 ]
 CORS_URLS_REGEX = r'^/hidden/secure/pulse/api/.*$'
 
@@ -75,14 +78,7 @@ DATABASES = {
         'PORT': '5432',
     },
 }
-# Heroku
-DATABASES['default'] = dj_database_url.config()
-DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql_psycopg2'
-DATABASES['default']['NAME'] = 'd7ig7nf58koqkj'
-DATABASES['default']['USER'] = 'bxccrhsatfvtza'
-DATABASES['default']['PASSWORD'] = 'bAOTtvkVjQS37f_c0UfD2MzD7Y'
-DATABASES['default']['HOST'] = 'ec2-54-235-102-190.compute-1.amazonaws.com'
-DATABASES['default']['PORT'] = '5432'
+DATABASES['default'].update(dj_database_url.config())  # For Heroku only
 
 
 # T E M P L A T E S
@@ -118,20 +114,6 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-#         'LOCATION': [
-#             '127.0.0.1:11211',
-#         ],
-#         'OPTIONS': {
-#             'MAX_ENTRIES': 1000
-#         }
-#     }
-# }
-# CACHE_MIDDLEWARE_ALIAS = 'default'
-# CACHE_MIDDLEWARE_SECONDS = 12
-# CACHE_MIDDLEWARE_KEY_PREFIX = ''
 
 # P U S H  N O T I F I C A T I O N S
 PUSH_NOTIFICATIONS_SETTINGS = {
@@ -152,36 +134,42 @@ if USING_S3:
     AWS_ACCESS_KEY_ID = 'AKIAI7W36GPXJW3W4UVA'
     AWS_SECRET_ACCESS_KEY = '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'
     AWS_STORAGE_BUCKET_NAME = 'pulseapplication'
-    S3DIRECT_REGION = 'us-east-1'
+    AWS_AUTO_CREATE_BUCKET = False
+    AWS_S3_REGION_NAME = 'us-east-1'
 
     AWS_QUERYSTRING_AUTH = False
+    AWS_QUERYSTRING_EXPIRE = 3600
     AWS_FILE_EXPIRE = 200
     AWS_PRELOAD_METADATA = True
+    AWS_S3_ENCRYPTION = False
+    AWS_S3_USE_SSL = True
     AWS_S3_SECURE_URLS = True
+    AWS_S3_FILE_OVERWRITE = True
+    AWS_S3_ENDPOINT_URL = None
 
-    STATICFILES_STORAGE = '{}.s3utils.StaticRootS3BotoStorage'.format(APP_NAME)
+    STATICFILES_STORAGE = '{}.s3utils.StaticS3BotoStorage'.format(APP_NAME)
     STATIC_S3_PATH = 'media/'
-    DEFAULT_FILE_STORAGE = '{}.s3utils.MediaRootS3BotoStorage'.format(APP_NAME)
+    DEFAULT_FILE_STORAGE = '{}.s3utils.MediaS3BotoStorage'.format(APP_NAME)
     DEFAULT_S3_PATH = 'static/'
+    S3_URL = '//s3.amazonaws.com/{}/'.format(AWS_STORAGE_BUCKET_NAME)
+    MEDIA_URL = S3_URL + STATIC_S3_PATH
+    STATIC_URL = S3_URL + DEFAULT_S3_PATH
 
     if USING_CLOUDFRONT:
         AWS_CLOUDFRONT_DOMAIN = ''
-        MEDIA_URL = '//{}/{}'.format(AWS_CLOUDFRONT_DOMAIN, STATIC_S3_PATH)
-        STATIC_URL = '//{}/{}'.format(AWS_CLOUDFRONT_DOMAIN, DEFAULT_S3_PATH)
+        MEDIA_URL = '//{0}/{1}'.format(AWS_CLOUDFRONT_DOMAIN, STATIC_S3_PATH)
+        STATIC_URL = '//{0}/{1}'.format(AWS_CLOUDFRONT_DOMAIN, DEFAULT_S3_PATH)
     elif USING_EC2:
-        S3_URL = '//{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
-        MEDIA_URL = S3_URL + STATIC_S3_PATH
-        STATIC_URL = S3_URL + DEFAULT_S3_PATH
         MEDIA_ROOT = '/home/ubuntu/{0}/{1}/media'.format(
             FULL_DOMAIN, APP_NAME)
         STATIC_ROOT = '/home/ubuntu/{0}/{1}/static/static'.format(
             FULL_DOMAIN, APP_NAME)
 
-    date_three_months_later = datetime.date.today() + datetime.timedelta(3 * 365 / 12)
-    expires = date_three_months_later.strftime('%A, %d %B %Y 20:00:00 EST')
+    two_months = datetime.timedelta(days=61)
+    two_months_later = datetime.date.today() + two_months
     AWS_HEADERS = {
-        'Expires': expires,
-        'Cache-Control': 'max-age=86400',
+        'Expires': two_months_later.strftime('%A, %d %B %Y 20:00:00 EST'),
+        'Cache-Control': 'max-age=%d' % (int(two_months.total_seconds()), ),
     }
 
 
