@@ -145,7 +145,7 @@ class PhotoCreateAPIView(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user,
-                        photo=self.request.data['photo'])
+                        photo=self.request.data.get('photo'))
 
 
 @api_view(['DELETE'])
@@ -393,23 +393,23 @@ class PartyCreateAPIView(ModelViewSet):
         user = self.request.user
         serializer.save(
             user=user,
-            party_type=self.request.data['party_type'],
-            invite_type=self.request.data['invite_type'],
-            name=self.request.data['name'],
-            location=self.request.data['location'],
-            latitude=self.request.data['latitude'],
-            longitude=self.request.data['longitude'],
-            party_size=self.request.data['party_size'],
-            party_month=self.request.data['party_month'],
-            party_day=self.request.data['party_day'],
-            party_year=self.request.data['party_year'],
-            start_time=self.request.data['start_time'],
-            end_time=self.request.data['end_time'],
-            description=self.request.data['description'],
-            image=self.request.data['image'],
+            party_type=self.request.data.get('party_type'),
+            invite_type=self.request.data.get('invite_type'),
+            name=self.request.data.get('name'),
+            location=self.request.data.get('location'),
+            latitude=self.request.data.get('latitude'),
+            longitude=self.request.data.get('longitude'),
+            party_size=self.request.data.get('party_size'),
+            party_month=self.request.data.get('party_month'),
+            party_day=self.request.data.get('party_day'),
+            party_year=self.request.data.get('party_year'),
+            start_time=self.request.data.get('start_time'),
+            end_time=self.request.data.get('end_time'),
+            description=self.request.data.get('description'),
+            image=self.request.data.get('image'),
         )
-        party = Party.objects.get(id=serializer.data['id'])
-        user_ids = self.request.data['invited_user_ids']
+        party = Party.objects.get(id=serializer.data.get('id'))
+        user_ids = self.request.data.get('invited_user_ids')
 
         if user_ids:
             for user_id in user_ids.split(','):
