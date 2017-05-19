@@ -33,10 +33,7 @@ class PartyManager(models.Manager):
         """
         Returns all of the parties the user is/has hosted.
         """
-        qs = super(PartyManager, self).get_queryset() \
-            .filter(user=user) \
-            .order_by('-is_active', 'party_year', 'party_month', 'party_day',
-                      '-start_time')
+        qs = super(PartyManager, self).get_queryset().filter(user=user)
 
         to_remove_ids = []
 
@@ -53,7 +50,10 @@ class PartyManager(models.Manager):
                 not party.invited_users.filter(id=viewing_user.id).exists()):
 
                 to_remove_ids.append(party.id)
-        return qs.exclude(id__in=to_remove_ids)
+        return qs.exclude(id__in=to_remove_ids).order_by(
+            '-is_active', 'party_year', 'party_month', 'party_day',
+            '-start_time'
+        )
 
     def own_parties_attending(self, user):
         """
