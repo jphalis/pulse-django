@@ -507,7 +507,7 @@ class OwnPartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
     ordering_fields = ('created',)
 
     def get_queryset(self):
-        return Party.objects.own_parties_hosting(user=self.request.user)
+        return Party.objects.own_parties_hosting(user=self.request.user, viewing_user=self.request.user)
 
 
 class UserPartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
@@ -520,7 +520,8 @@ class UserPartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
 
     def get_queryset(self):
         return Party.objects.own_parties_hosting(
-            user=MyUser.objects.get(pk=self.kwargs['user_pk']))
+            user=MyUser.objects.get(pk=self.kwargs['user_pk']),
+            viewing_user=self.request.user)
 
 
 @api_view(['POST'])

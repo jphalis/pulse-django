@@ -81,11 +81,13 @@ class MyUserSerializer(serializers.HyperlinkedModelSerializer):
         return dict(MyUser.GENDER_CHOICES)[obj.gender]
 
     def get_event_count(self, obj):
-        count = Party.objects.own_parties_hosting(user=obj).count()
+        request = self.context['request']
+        count = Party.objects.own_parties_hosting(user=obj, viewing_user=request.user).count()
         return '0' if count == 0 else str(count)
 
     def get_event_images(self, obj):
-        return Party.objects.own_parties_hosting(user=obj).values(
+        request = self.context['request']
+        return Party.objects.own_parties_hosting(user=obj, viewing_user=request.user).values(
             'id', 'image')
 
     def get_photos(self, obj):

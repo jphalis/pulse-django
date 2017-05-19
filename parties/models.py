@@ -29,14 +29,31 @@ class PartyManager(models.Manager):
         return super(PartyManager, self).get_queryset() \
             .filter(is_active=True)
 
-    def own_parties_hosting(self, user):
+    def own_parties_hosting(self, user, viewing_user):
         """
         Returns all of the parties the user is/has hosted.
         """
-        return super(PartyManager, self).get_queryset() \
+        qs = super(PartyManager, self).get_queryset() \
             .filter(user=user) \
             .order_by('-is_active', 'party_year', 'party_month', 'party_day',
                       '-start_time')
+
+        to_remove_ids = []
+
+        for party in qs:
+            # viewing user cannot be the party creator
+            # party must be invite only
+            # viewing user cannot be attending the party
+            # viewing user cannot be already invited
+            # if any fail, show the party
+            # if they all pass, hide the party
+            if (viewing_user != party.user and
+                party.invite_type == Party.INVITE_ONLY and
+                not party.attendees.filter(id=viewing_user.id).exists() and
+                not party.invited_users.filter(id=viewing_user.id).exists()):
+
+                to_remove_ids.append(party.id)
+        return qs.exclude(id__in=to_remove_ids)
 
     def own_parties_attending(self, user):
         """
