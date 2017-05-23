@@ -391,25 +391,34 @@ class PartyCreateAPIView(ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
+        data = self.request.data
+        party_type = data.get('party_type')
+        invite_type = data.get('invite_type')
+        name = data.get('name')
+        location = data.get('location')
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
+        party_size = data.get('party_size')
+        party_month = data.get('party_month')
+        party_day = data.get('party_day')
+        party_year = data.get('party_year')
+        start_time = data.get('start_time')
+        recurrence = data.get('recurrence')
+        end_time = data.get('end_time')
+        description = data.get('description')
+        image = data.get('image')
         serializer.save(
-            user=user,
-            party_type=self.request.data.get('party_type'),
-            invite_type=self.request.data.get('invite_type'),
-            name=self.request.data.get('name'),
-            location=self.request.data.get('location'),
-            latitude=self.request.data.get('latitude'),
-            longitude=self.request.data.get('longitude'),
-            party_size=self.request.data.get('party_size'),
-            party_month=self.request.data.get('party_month'),
-            party_day=self.request.data.get('party_day'),
-            party_year=self.request.data.get('party_year'),
-            start_time=self.request.data.get('start_time'),
-            end_time=self.request.data.get('end_time'),
-            description=self.request.data.get('description'),
-            image=self.request.data.get('image'),
+            user=user, party_type=party_type, invite_type=invite_type,
+            name=name, location=location, latitude=latitude,
+            longitude=longitude, party_size=party_size,
+            party_month=party_month, party_day=party_day,
+            party_year=party_year, start_time=start_time,
+            recurrence=recurrence, end_time=end_time, description=description,
+            image=image
         )
         party = Party.objects.get(id=serializer.data.get('id'))
-        user_ids = self.request.data.get('invited_user_ids')
+        party.attendees.add(user)
+        user_ids = data.get('invited_user_ids')
 
         if user_ids:
             for user_id in user_ids.split(','):
@@ -434,14 +443,66 @@ class PartyCreateAPIView(ModelViewSet):
                         sound='default'
                     )
 
-        party.attendees.add(user)
-
         if party.invite_type != Party.INVITE_ONLY:
             feed_item.send(
                 user,
                 verb='hosting an event.',
                 target=party,
             )
+
+        if party.recurrence != Party.NONE:
+            start_date = date(
+                int(party_year),
+                int(party_month),
+                int(party_day)
+            )
+
+            if party.recurrence == Party.DAILY:
+                for i in range(6):
+                    start_date += timedelta(days=1)
+                    day = start_date.strftime('%d')
+                    month = start_date.strftime('%m')
+                    year = start_date.strftime('%Y')
+                    Party.objects.create(
+                        user=user, party_type=party_type,
+                        invite_type=invite_type, name=name, location=location,
+                        latitude=latitude, longitude=longitude,
+                        party_size=party_size, party_month=month,
+                        party_day=day, party_year=year, start_time=start_time,
+                        recurrence=recurrence, end_time=end_time,
+                        description=description, image=image
+                    )
+            elif party.recurrence == Party.WEEKLY:
+                for i in range(3):
+                    start_date += timedelta(weeks=1)
+                    day = start_date.strftime('%d')
+                    month = start_date.strftime('%m')
+                    year = start_date.strftime('%Y')
+                    Party.objects.create(
+                        user=user, party_type=party_type,
+                        invite_type=invite_type, name=name, location=location,
+                        latitude=latitude, longitude=longitude,
+                        party_size=party_size, party_month=month,
+                        party_day=day, party_year=year, start_time=start_time,
+                        recurrence=recurrence, end_time=end_time,
+                        description=description, image=image
+                    )
+            elif party.recurrence == Party.MONTHLY:
+                for i in range(2):
+                    start_date += timedelta(weeks=4)
+                    day = start_date.strftime('%d')
+                    month = start_date.strftime('%m')
+                    year = start_date.strftime('%Y')
+                    Party.objects.create(
+                        user=user, party_type=party_type,
+                        invite_type=invite_type, name=name, location=location,
+                        latitude=latitude, longitude=longitude,
+                        party_size=party_size, party_month=month,
+                        party_day=day, party_year=year, start_time=start_time,
+                        recurrence=recurrence, end_time=end_time,
+                        description=description, image=image
+                    )
+        return serializer
 
 
 class PartyDetailAPIView(generics.RetrieveAPIView,
@@ -471,7 +532,8 @@ class PartyDetailAPIView(generics.RetrieveAPIView,
             obj.is_active = False if expires_on <= now else True
         else:
             expires_on = date(
-                obj.party_year, obj.party_month, obj.party_day)
+                obj.party_year, obj.party_month, obj.party_day
+            )
             obj.is_active = False if now.date() > expires_on else True
         obj.save(update_fields=['is_active'])
         return obj
@@ -507,7 +569,9 @@ class OwnPartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
     ordering_fields = ('created',)
 
     def get_queryset(self):
-        return Party.objects.own_parties_hosting(user=self.request.user, viewing_user=self.request.user)
+        return Party.objects.own_parties_hosting(
+            user=self.request.user, viewing_user=self.request.user
+        )
 
 
 class UserPartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):

@@ -11,6 +11,7 @@ class PartySerializer(serializers.HyperlinkedModelSerializer):
     user_profile_pic = serializers.ImageField(source='user.profile_pic')
     party_type = serializers.SerializerMethodField()
     invite_type = serializers.SerializerMethodField()
+    recurrence = serializers.SerializerMethodField()
     party_size = serializers.SerializerMethodField()
     start_time = serializers.SerializerMethodField()
     end_time = serializers.SerializerMethodField()
@@ -20,9 +21,9 @@ class PartySerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'is_active', 'party_url', 'user_url', 'user',
                   'user_profile_pic', 'party_type', 'invite_type', 'name',
                   'location', 'latitude', 'longitude', 'party_size',
-                  'party_month', 'party_day', 'party_year', 'start_time',
-                  'end_time', 'description', 'image', 'attendees_count',
-                  'requesters_count', 'get_attendees_info',
+                  'party_month', 'party_day', 'party_year', 'recurrence',
+                  'start_time', 'end_time', 'description', 'image',
+                  'attendees_count', 'requesters_count', 'get_attendees_info',
                   'get_requesters_info', 'get_invited_users_info',
                   'get_likers_info',)
 
@@ -41,6 +42,9 @@ class PartySerializer(serializers.HyperlinkedModelSerializer):
 
     def get_invite_type(self, obj):
         return dict(Party.INVITE_TYPES)[obj.invite_type]
+
+    def get_recurrence(self, obj):
+        return dict(Party.RECURRENCE_TYPES)[obj.recurrence]
 
     def get_party_size(self, obj):
         return dict(Party.PARTY_SIZES)[obj.party_size]
@@ -61,8 +65,8 @@ class PartyCreateSerializer(serializers.ModelSerializer):
         model = Party
         fields = ('id', 'party_type', 'name', 'location', 'latitude',
                   'longitude', 'party_size', 'party_month', 'party_day',
-                  'party_year', 'start_time', 'end_time', 'description',
-                  'image', 'invite_type', 'party_url',)
+                  'party_year', 'start_time', 'recurrence', 'end_time',
+                  'description', 'image', 'invite_type', 'party_url',)
 
     def get_party_url(self, obj):
         return api_reverse('party_detail_api',

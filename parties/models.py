@@ -15,24 +15,18 @@ from core.models import TimeStampedModel
 
 
 def party_image_upload_loc(instance, filename):
-    """
-    Stores the party images in party_images/<filename>.
-    """
+    """Stores the party images in party_images/<filename>."""
     return "party_images/{}".format(filename)
 
 
 class PartyManager(models.Manager):
     def active(self):
-        """
-        Returns all active parties.
-        """
+        """Returns all active parties."""
         return super(PartyManager, self).get_queryset() \
             .filter(is_active=True)
 
     def own_parties_hosting(self, user, viewing_user):
-        """
-        Returns all of the parties the user is/has hosted.
-        """
+        """Returns all of the parties the user is/has hosted."""
         qs = super(PartyManager, self).get_queryset().filter(user=user)
 
         to_remove_ids = []
@@ -56,18 +50,14 @@ class PartyManager(models.Manager):
         )
 
     def own_parties_attending(self, user):
-        """
-        Returns all of the parties the user is attending.
-        """
-        return super(PartyManager, self).get_queryset() \
-            .filter(attendees=user)
+        """Returns all of the parties the user is attending."""
+        return super(PartyManager, self).get_queryset().filter(attendees=user)
 
-    def party_create(self, user, party_type, name, location, party_size,
-                     party_month, party_day, start_time, end_time=None,
-                     description=None, image=None, **extra_fields):
-        """
-        Creates a party.
-        """
+    def party_create(self, user, party_type, invite_type, name, location,
+                     party_size, party_month, party_day, start_time,
+                     recurrence, end_time=None, description=None, image=None,
+                     **extra_fields):
+        """Creates a party."""
         if not user:
             raise ValueError('There must be a user assigned to this party.')
         elif not party_type:
@@ -94,6 +84,7 @@ class PartyManager(models.Manager):
             party_month=party_month,
             party_day=party_day,
             start_time=start_time,
+            recurrence=recurrence,
             end_time=end_time,
             description=description,
             image=image,
@@ -122,6 +113,11 @@ class Party(TimeStampedModel):
     INVITE_ONLY = 16
     REQUEST_APPROVAL = 17
 
+    NONE = 20
+    DAILY = 21
+    WEEKLY = 22
+    MONTHLY = 23
+
     PARTY_TYPES = (
         (CUSTOM, _('Custom')),
         (SOCIAL, _('Social')),
@@ -141,9 +137,16 @@ class Party(TimeStampedModel):
         (INVITE_ONLY, _('Invite only')),
         (REQUEST_APPROVAL, _('Request + approval')),
     )
+    RECURRENCE_TYPES = (
+        (NONE, _('None')),
+        (DAILY, _('Daily')),
+        (WEEKLY, _('Weekly')),
+        (MONTHLY, _('Monthly')),
+    )
 
     party_type = models.IntegerField(choices=PARTY_TYPES, default=CUSTOM)
     invite_type = models.IntegerField(choices=INVITE_TYPES, default=OPEN)
+    recurrence = models.IntegerField(choices=RECURRENCE_TYPES, default=NONE)
     name = models.CharField(max_length=80)
     location = models.CharField(max_length=240)
     latitude = models.DecimalField(max_digits=12, decimal_places=8, null=True)
@@ -190,42 +193,30 @@ class Party(TimeStampedModel):
 
     @cached_property
     def get_attendees_info(self):
-        """
-        Returns the information for each attendee of the party.
-        """
+        """Returns the information for each attendee of the party."""
         return self.attendees.values('id', 'full_name', 'profile_pic',)
 
     @cached_property
     def get_requesters_info(self):
-        """
-        Returns the information for each requester of the party.
-        """
+        """Returns the information for each requester of the party."""
         return self.requesters.values('id', 'full_name', 'profile_pic',)
 
     @cached_property
     def get_likers_info(self):
-        """
-        Returns the information for each liker of the party.
-        """
+        """Returns the information for each liker of the party."""
         return self.likers.values('id', 'full_name',)
 
     @cached_property
     def get_invited_users_info(self):
-        """
-        Returns the information for each invited user of the party.
-        """
+        """Returns the information for each invited user of the party."""
         return self.invited_users.values('id', 'full_name', 'profile_pic',)
 
     @property
     def attendees_count(self):
-        """
-        Returns the number of attendees of the party.
-        """
+        """Returns the number of attendees of the party."""
         return str(self.get_attendees_info.count())
 
     @property
     def requesters_count(self):
-        """
-        Returns the number of requesters of the party.
-        """
+        """Returns the number of requesters of the party."""
         return str(self.get_requesters_info.count())

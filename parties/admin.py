@@ -19,7 +19,8 @@ class PartyAdmin(admin.ModelAdmin):
                         'latitude', 'longitude', 'party_size', 'party_month',
                         'party_day', 'party_year', 'start_time', 'end_time',
                         'description', 'image', 'user', 'attendees',
-                        'requesters', 'invited_users', 'likers',)}),
+                        'requesters', 'invited_users', 'likers',
+                        'recurrence',)}),
         (_('Permissions'),
             {'fields': ('is_active',)}),
         (_('Dates'),
@@ -30,16 +31,12 @@ class PartyAdmin(admin.ModelAdmin):
     actions = ('enable', 'disable',)
 
     def enable(self, request, queryset):
-        """
-        Updates is_active to be True.
-        """
+        """Updates is_active to be True."""
         queryset.update(is_active=True)
     enable.short_description = _("Enable selected parties")
 
     def disable(self, request, queryset):
-        """
-        Updates is_active to be False.
-        """
+        """Updates is_active to be False."""
         queryset.update(is_active=False)
     disable.short_description = _("Disable selected parties")
 
