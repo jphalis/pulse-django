@@ -551,13 +551,27 @@ class PartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
     search_fields = ('user__email', 'user__full_name',
                      'attendees__email', 'attendees__full_name',
                      'requesters__email', 'requesters__full_name',)
-    queryset = Party.objects.active().exclude(
-        invite_type=Party.INVITE_ONLY).order_by(
-            'party_year', 'party_month', 'party_day', 'start_time')
+    # queryset = Party.objects.active().exclude(
+    #     invite_type=Party.INVITE_ONLY).order_by(
+    #         'party_year', 'party_month', 'party_day', 'start_time')
 
     @never_cache
     def dispatch(self, *args, **kwargs):
         return super(PartyListAPIView, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        qs = Party.objects.active().exclude(invite_type=Party.INVITE_ONLY)
+        to_remove_ids = []
+
+        for party in qs:
+            start_date = date(party.party_year,
+                              party.party_month,
+                              party.party_day)
+            if party.recurrence != Party.NONE and start_date > date.today():
+                to_remove_ids.append(party.id)
+        return qs.exclude(id__in=to_remove_ids).order_by(
+            'party_year', 'party_month', 'party_day', 'start_time'
+        )
 
 
 class OwnPartyListAPIView(DefaultsMixin, FiltersMixin, generics.ListAPIView):
